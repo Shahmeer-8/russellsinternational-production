@@ -16,9 +16,11 @@ class PageSectionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'Page Content';
+    protected static ?string $navigationGroup = 'Home Page';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationLabel = 'Page Sections';
+
+    protected static ?int $navigationSort = 7;
 
     public static function form(Form $form): Form
     {
@@ -68,7 +70,7 @@ class PageSectionResource extends Resource
                     ->valueLabel('Value')
                     ->columnSpanFull(),
                 Forms\Components\KeyValue::make('items')
-                    ->helperText('Optional repeated/structured values. Use stable keys like item_1_title, item_1_url, requirement_1.')
+                    ->helperText('For the homepage study/skills section use keys like country_1_code, country_1_name, country_1_meta, course_1_title, course_1_meta.')
                     ->keyLabel('Field')
                     ->valueLabel('Value')
                     ->columnSpanFull(),
