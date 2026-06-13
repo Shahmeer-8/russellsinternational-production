@@ -4,7 +4,6 @@ import HomeNewsCarousel from "@/components/HomeNewsCarousel";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import DualFocusSection from "@/components/DualFocusSection";
 import Testimonials from "@/components/Testimonials";
-import CTASection from "@/components/CTASection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 
@@ -16,7 +15,6 @@ const Index = () => (
     <DualFocusSection />
     <HomeNewsCarousel />
     <Testimonials />
-    <CTASection />
     <ContactSection />
     <Footer />
   </div>
