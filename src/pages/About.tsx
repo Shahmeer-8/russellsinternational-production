@@ -4,10 +4,35 @@ import DynamicPageHero from "@/components/DynamicPageHero";
 import CTASection from "@/components/CTASection";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { usePageSections, useTeamMembers } from "@/hooks/api";
-import { sectionText } from "@/lib/content";
+import { sectionImage, sectionText } from "@/lib/content";
 import { Target, Eye, Heart, Users } from "lucide-react";
+import aboutHeroImg from "@/assets/about-hero.jpg";
+import campusLifeImg from "@/assets/campus-life.jpg";
+import founderPortraitImg from "@/assets/founder-portrait.jpg";
 
 const pillarIcons = [Target, Eye, Heart];
+
+const fallbackCampus = {
+  eyebrow: "Campus Life",
+  title: "A Living, Learning Ecosystem",
+  body: "A modern learning environment with training labs, counselling spaces, and student support facilities.",
+  image: campusLifeImg,
+  ctaLabel: "Contact Us",
+  ctaUrl: "/#contact",
+};
+
+const fallbackFounder = {
+  eyebrow: "Founder Message",
+  title: "Dear Students, Parents and Well-Wishers",
+  body: "Together, we shape brighter futures through education, skills, and global opportunity.",
+  image: founderPortraitImg,
+};
+
+const fallbackFoundationItems = {
+  Mission: "To deliver skill-based programs that prepare students for global success.",
+  Vision: "To create a learning climate where students become productive and socially conscious.",
+  "Core Values": "Commitment, accessibility, and excellence in every learning journey.",
+};
 
 const About = () => {
   const intro = useScrollReveal();
@@ -19,10 +44,11 @@ const About = () => {
   const campus = sections.campus_life;
   const founderSection = sections.founder_message;
   const foundation = sections.foundation;
-  const pillars = Object.entries(foundation?.items ?? {}).map(([title, body], index) => ({
+  const foundationItems = foundation?.items && !Array.isArray(foundation.items) ? foundation.items : fallbackFoundationItems;
+  const pillars = Object.entries(foundationItems).map(([title, body], index) => ({
     icon: pillarIcons[index % pillarIcons.length],
     title,
-    body,
+    body: String(body),
   }));
   const displayedTeam = (teamData?.data ?? []).map((member) => ({
     name: member.name,
@@ -36,10 +62,10 @@ const About = () => {
       <DynamicPageHero
         page="about"
         fallback={{
-          eyebrow: "",
-          title: "",
-          description: "",
-          image: "",
+          eyebrow: "About Us",
+          title: "Change Begins With One Dream",
+          description: "A premier education consultancy and IT training institute bridging ambition with global opportunity.",
+          image: aboutHeroImg,
           crumbs: [{ label: "Home", to: "/" }, { label: "About Us" }],
         }}
       />
@@ -50,7 +76,7 @@ const About = () => {
             <div className="h-80 rounded-3xl bg-muted animate-pulse" />
           </div>
         </section>
-      ) : campus && (
+      ) : (
         <section className="py-20 md:py-28">
           <div
             ref={intro.ref}
@@ -58,21 +84,21 @@ const About = () => {
           >
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
-                <span className="section-label">{sectionText(campus, "eyebrow", "")}</span>
-                <h2 className="section-title mt-3 mb-5">{sectionText(campus, "title", "")}</h2>
+                <span className="section-label">{sectionText(campus, "eyebrow", fallbackCampus.eyebrow)}</span>
+                <h2 className="section-title mt-3 mb-5">{sectionText(campus, "title", fallbackCampus.title)}</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  {sectionText(campus, "body", "")}
+                  {sectionText(campus, "body", fallbackCampus.body)}
                 </p>
-                {sectionText(campus, "cta_url", "") && sectionText(campus, "cta_label", "") && (
-                  <a href={sectionText(campus, "cta_url", "")} className="btn-accent inline-flex">
-                    {sectionText(campus, "cta_label", "")}
+                {sectionText(campus, "cta_url", fallbackCampus.ctaUrl) && sectionText(campus, "cta_label", fallbackCampus.ctaLabel) && (
+                  <a href={sectionText(campus, "cta_url", fallbackCampus.ctaUrl)} className="btn-accent inline-flex">
+                    {sectionText(campus, "cta_label", fallbackCampus.ctaLabel)}
                   </a>
                 )}
               </div>
-              {campus.image_url && (
+              {sectionImage(campus, fallbackCampus.image) && (
                 <div className="relative">
                   <div className="rounded-3xl overflow-hidden shadow-xl">
-                    <img src={campus.image_url} alt={sectionText(campus, "title", "")} loading="lazy" decoding="async" width={1200} height={800} className="w-full h-auto object-cover" />
+                    <img src={sectionImage(campus, fallbackCampus.image)} alt={sectionText(campus, "title", fallbackCampus.title)} loading="lazy" decoding="async" width={1200} height={800} className="w-full h-auto object-cover" />
                   </div>
                 </div>
               )}
@@ -81,41 +107,39 @@ const About = () => {
         </section>
       )}
 
-      {founderSection && (
-        <section className="py-20 md:py-28 bg-section-alt">
+      <section className="py-20 md:py-28 bg-section-alt">
           <div
             ref={founder.ref}
             className={`container mx-auto px-4 md:px-8 transition-all duration-700 ${founder.visible ? "opacity-100" : "opacity-0"}`}
           >
             <div className="grid lg:grid-cols-5 gap-12 items-center">
               <div className="lg:col-span-2">
-                {founderSection.image_url && (
+                {sectionImage(founderSection, fallbackFounder.image) && (
                   <div className="rounded-3xl overflow-hidden shadow-xl max-w-sm mx-auto">
-                    <img src={founderSection.image_url} alt={sectionText(founderSection, "title", "")} loading="lazy" decoding="async" width={800} height={1000} className="w-full h-auto object-cover" />
+                    <img src={sectionImage(founderSection, fallbackFounder.image)} alt={sectionText(founderSection, "title", fallbackFounder.title)} loading="lazy" decoding="async" width={800} height={1000} className="w-full h-auto object-cover" />
                   </div>
                 )}
               </div>
               <div className="lg:col-span-3">
-                <span className="section-label">{sectionText(founderSection, "eyebrow", "")}</span>
-                <h2 className="section-title mt-3 mb-5">{sectionText(founderSection, "title", "")}</h2>
+                <span className="section-label">{sectionText(founderSection, "eyebrow", fallbackFounder.eyebrow)}</span>
+                <h2 className="section-title mt-3 mb-5">{sectionText(founderSection, "title", fallbackFounder.title)}</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  {sectionText(founderSection, "body", "")}
+                  {sectionText(founderSection, "body", fallbackFounder.body)}
                 </p>
               </div>
             </div>
           </div>
         </section>
-      )}
 
-      {foundation && pillars.length > 0 && (
+      {pillars.length > 0 && (
         <section className="py-20 md:py-28">
           <div
             ref={pillarsR.ref}
             className={`container mx-auto px-4 md:px-8 transition-all duration-700 ${pillarsR.visible ? "opacity-100" : "opacity-0"}`}
           >
             <div className="text-center mb-14">
-              <span className="section-label">{sectionText(foundation, "eyebrow", "")}</span>
-              <h2 className="section-title mt-3">{sectionText(foundation, "title", "")}</h2>
+              <span className="section-label">{sectionText(foundation, "eyebrow", "What Drives Us")}</span>
+              <h2 className="section-title mt-3">{sectionText(foundation, "title", "Our Foundation")}</h2>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
               {pillars.map((p) => (
