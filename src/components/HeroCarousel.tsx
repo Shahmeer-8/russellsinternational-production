@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { useHeroSlides, useTickerItems } from "@/hooks/api";
@@ -43,13 +43,27 @@ const HeroCarousel = () => {
   const apiTickerItems = (tickerData?.data ?? []).map((t) => `${t.emoji ?? ""} ${t.text}`.trim());
   const tickerItems = apiTickerItems.length > 0 ? apiTickerItems : fallbackTickerItems;
 
-  useEffect(() => {
-    if (slides.length === 0) return;
-    const id = setInterval(() => setActive((p) => (p + 1) % slides.length), 6000);
-    return () => clearInterval(id);
-  }, [slides.length]);
+  const goTo = useCallback(
+    (nextIndex: number) => {
+      setActive((nextIndex + slides.length) % slides.length);
+    },
+    [slides.length],
+  );
 
-  const go = (dir: number) => setActive((p) => (p + dir + slides.length) % slides.length);
+  const go = useCallback(
+    (dir: number) => {
+      setActive((p) => (p + dir + slides.length) % slides.length);
+    },
+    [slides.length],
+  );
+
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const id = window.setTimeout(() => {
+      go(1);
+    }, 5000);
+    return () => window.clearTimeout(id);
+  }, [active, go, slides.length]);
 
   return (
     <section className="relative pt-16">
@@ -129,7 +143,7 @@ const HeroCarousel = () => {
               {slides.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => setActive(i)}
+                  onClick={() => goTo(i)}
                   className={`h-2 rounded-full transition-all ${i === active ? "w-8 bg-accent" : "w-2 bg-primary-foreground/40 hover:bg-primary-foreground/60"}`}
                   aria-label={`Go to slide ${i + 1}`}
                 />
