@@ -2,7 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\Login;
 use App\Filament\Widgets\StatsOverview;
+use App\Http\Middleware\AdminInactivityTimeout;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -10,6 +12,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -26,7 +29,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
+            ->login(Login::class)
             ->colors([
                 'primary' => Color::hex('#0c1b47'),
                 'gray' => Color::Slate,
@@ -38,12 +41,17 @@ class AdminPanelProvider extends PanelProvider
             ->pages([Pages\Dashboard::class])
             ->discoverWidgets(app_path('Filament/Widgets'), 'App\\Filament\\Widgets')
             ->widgets([StatsOverview::class])
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn (): string => view('filament.scripts.admin-idle-lock')->render(),
+            )
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
+                AdminInactivityTimeout::class,
                 VerifyCsrfToken::class,
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
