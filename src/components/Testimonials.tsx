@@ -40,7 +40,7 @@ const Testimonials = () => {
   const videoList = apiVideos;
 
   const renderVideoCard = (v: typeof videoList[number]) => (
-    <div key={v.id} className="premium-card overflow-hidden group">
+    <div key={v.id} className="premium-card h-full overflow-hidden group">
       <div className="relative aspect-video bg-muted">
         <iframe
           src={`https://www.youtube.com/embed/${v.id}`}
@@ -64,8 +64,27 @@ const Testimonials = () => {
     </div>
   );
 
+  const renderWrittenCard = (r: typeof writtenList[number]) => (
+    <div key={r.name} className="premium-card h-full p-7 relative group">
+      <Quote className="w-8 h-8 text-muted/80 absolute top-6 right-6" />
+      <div className="flex gap-1 mb-4">
+        {[...Array(5)].map((_, i) => (
+          <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+        ))}
+      </div>
+      <p className="text-sm text-muted-foreground leading-relaxed mb-6">"{r.text}"</p>
+      <div className="flex items-center gap-3">
+        {r.image && <img src={r.image} alt={r.name} className="w-12 h-12 rounded-full object-cover border-2 border-border" loading="lazy" decoding="async" width={512} height={512} />}
+        <div>
+          <div className="font-semibold text-foreground text-sm">{r.name}</div>
+          <div className="text-xs text-muted-foreground">{r.program}</div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <section id="testimonials" className="pt-20 pb-0 md:pt-28">
+    <section id="testimonials" className="py-20 md:py-28">
       <div
         ref={ref}
         className={`container mx-auto px-4 md:px-8 transition-all duration-700 ${visible ? "opacity-100" : "opacity-0"}`}
@@ -100,26 +119,23 @@ const Testimonials = () => {
           </div>
         )}
 
-        {!isLoading && writtenList.length > 0 && (
+        {!isLoading && writtenList.length > 3 && (
+          <Carousel opts={{ align: "start", loop: true }} className="relative">
+            <CarouselContent className="-ml-4">
+              {writtenList.map((r) => (
+                <CarouselItem key={r.name} className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                  {renderWrittenCard(r)}
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex -left-4" />
+            <CarouselNext className="hidden md:flex -right-4" />
+          </Carousel>
+        )}
+
+        {!isLoading && writtenList.length > 0 && writtenList.length <= 3 && (
           <div className="grid md:grid-cols-3 gap-6">
-            {writtenList.map((r) => (
-            <div key={r.name} className="premium-card p-7 relative group">
-              <Quote className="w-8 h-8 text-muted/80 absolute top-6 right-6" />
-              <div className="flex gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-6">"{r.text}"</p>
-              <div className="flex items-center gap-3">
-                {r.image && <img src={r.image} alt={r.name} className="w-12 h-12 rounded-full object-cover border-2 border-border" loading="lazy" decoding="async" width={512} height={512} />}
-                <div>
-                  <div className="font-semibold text-foreground text-sm">{r.name}</div>
-                  <div className="text-xs text-muted-foreground">{r.program}</div>
-                </div>
-              </div>
-            </div>
-            ))}
+            {writtenList.map(renderWrittenCard)}
           </div>
         )}
       </div>

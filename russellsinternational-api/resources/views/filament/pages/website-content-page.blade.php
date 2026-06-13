@@ -26,9 +26,29 @@
                                 </x-filament::badge>
                             </div>
 
-                            <p class="mb-4 flex-1 text-sm leading-6 text-gray-600 dark:text-gray-300">
-                                {{ $section['description'] }}
-                            </p>
+                            @if (! empty($section['previewImage']))
+                                <img
+                                    src="{{ $section['previewImage'] }}"
+                                    alt=""
+                                    class="mb-3 h-28 w-full rounded-lg object-cover ring-1 ring-gray-950/10 dark:ring-white/10"
+                                />
+                            @endif
+
+                            <div class="mb-4 flex-1 space-y-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                                <p>{{ $section['description'] }}</p>
+
+                                @if (! empty($section['previewTitle']) || ! empty($section['previewBody']))
+                                    <div class="rounded-lg bg-gray-50 p-3 ring-1 ring-gray-950/5 dark:bg-gray-800 dark:ring-white/10">
+                                        @if (! empty($section['previewTitle']))
+                                            <p class="font-semibold text-gray-950 dark:text-white">{{ $section['previewTitle'] }}</p>
+                                        @endif
+
+                                        @if (! empty($section['previewBody']))
+                                            <p class="mt-1 line-clamp-3 text-xs leading-5 text-gray-500 dark:text-gray-400">{{ $section['previewBody'] }}</p>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
 
                             <a
                                 href="{{ $section['url'] }}"

@@ -47,6 +47,9 @@ abstract class WebsiteContentPage extends FilamentPage
             'meta' => "{$pageSlug} / {$sectionKey}",
             'status' => $section ? ($section->is_active ? 'Visible' : 'Hidden') : 'Missing',
             'statusColor' => $section ? ($section->is_active ? 'success' : 'warning') : 'danger',
+            'previewTitle' => $section?->title ?: $section?->eyebrow,
+            'previewBody' => $section?->subtitle ?: $section?->body,
+            'previewImage' => $section?->image_url,
             'url' => $section
                 ? PageSectionResource::getUrl('edit', ['record' => $section])
                 : PageSectionResource::getUrl('create'),
@@ -67,6 +70,9 @@ abstract class WebsiteContentPage extends FilamentPage
             'meta' => "page / {$slug}",
             'status' => $page ? ($page->is_active ? 'Visible' : 'Hidden') : 'Missing',
             'statusColor' => $page ? ($page->is_active ? 'success' : 'warning') : 'danger',
+            'previewTitle' => $page?->meta_title ?: $page?->name,
+            'previewBody' => $page?->meta_description,
+            'previewImage' => null,
             'url' => $page
                 ? PageResource::getUrl('edit', ['record' => $page])
                 : PageResource::getUrl('create'),
@@ -86,6 +92,9 @@ abstract class WebsiteContentPage extends FilamentPage
             'meta' => 'multiple records',
             'status' => 'Editable',
             'statusColor' => 'info',
+            'previewTitle' => null,
+            'previewBody' => null,
+            'previewImage' => null,
             'url' => $resource::getUrl(),
             'action' => $action,
         ];

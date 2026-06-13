@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             JobSeeder::class,
             EventSeeder::class,
             TestimonialSeeder::class,
+            ProductionContentBackfillSeeder::class,
         ]);
 
         $this->command->info('✅  Database seeded with Russell\'s International initial data.');
