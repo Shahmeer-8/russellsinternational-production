@@ -1,8 +1,9 @@
-import { GraduationCap, Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Youtube } from "lucide-react";
+import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Youtube } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigation, useSettings } from "@/hooks/api";
 import { badgeClass, isExternalUrl } from "@/lib/navigation";
 import type { NavigationItem } from "@/types/api";
+import russellsLogo from "@/assets/russells-logo.png";
 
 const socials = [
   { icon: Facebook, keys: ["facebook_url", "facebook"], label: "Facebook" },
@@ -53,11 +54,15 @@ const Footer = () => {
       <div className="container mx-auto px-4 md:px-8 py-12 md:py-16">
         <div className="grid lg:grid-cols-12 gap-10">
           <div className="lg:col-span-4">
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-primary-foreground/10 flex items-center justify-center">
-                <GraduationCap className="w-5 h-5" />
-              </div>
-              {siteName && <span className="font-heading font-bold">{siteName}</span>}
+            <div className="mb-4">
+              <img
+                src={russellsLogo}
+                alt={siteName ?? "Russell's International"}
+                className="h-20 w-56 object-contain object-left"
+                width={500}
+                height={500}
+                loading="lazy"
+              />
             </div>
             {footerText && (
               <p className="text-sm text-primary-foreground/50 leading-relaxed mb-5">

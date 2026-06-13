@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { GraduationCap, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useNavigation, useSettings } from "@/hooks/api";
 import type { NavigationItem } from "@/types/api";
 import { badgeClass, isExternalUrl } from "@/lib/navigation";
+import russellsLogo from "@/assets/russells-logo.png";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -61,11 +62,16 @@ const Navbar = () => {
         : "bg-background/80 backdrop-blur-sm"
     }`}>
       <div className="container mx-auto flex items-center justify-between h-16 px-4 md:px-8">
-        <Link to="/" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-            <GraduationCap className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <span className="font-heading font-bold text-lg text-foreground">
+        <Link to="/" className="flex items-center">
+          <img
+            src={russellsLogo}
+            alt={siteName}
+            className="h-12 w-36 object-contain object-left md:w-44"
+            width={500}
+            height={500}
+            fetchPriority="high"
+          />
+          <span className="sr-only">
             {siteName}
           </span>
         </Link>
