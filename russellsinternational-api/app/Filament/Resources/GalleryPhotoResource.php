@@ -16,6 +16,8 @@ class GalleryPhotoResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationGroup = 'Events & Gallery';
 
     protected static ?int $navigationSort = 2;

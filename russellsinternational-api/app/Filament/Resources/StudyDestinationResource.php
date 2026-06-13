@@ -16,6 +16,8 @@ class StudyDestinationResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationGroup = 'Study Abroad';
 
     protected static ?int $navigationSort = 1;

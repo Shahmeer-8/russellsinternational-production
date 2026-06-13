@@ -16,6 +16,8 @@ class CourseResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationGroup = 'Skills & Courses';
 
     protected static ?int $navigationSort = 1;

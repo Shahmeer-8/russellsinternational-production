@@ -16,6 +16,8 @@ class JobResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationGroup = 'Careers';
 
     protected static ?int $navigationSort = 1;

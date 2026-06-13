@@ -16,6 +16,8 @@ class TeamMemberResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationGroup = 'Page Heroes & Sections';
 
     protected static ?int $navigationSort = 1;

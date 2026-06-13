@@ -16,6 +16,8 @@ class PageSectionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationGroup = 'Page Heroes & Sections';
 
     protected static ?string $navigationLabel = 'Editable Page Sections';

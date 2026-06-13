@@ -16,6 +16,8 @@ class InternshipResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rocket-launch';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationGroup = 'Careers';
 
     protected static ?int $navigationSort = 2;

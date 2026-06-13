@@ -16,6 +16,8 @@ class HeroSlideResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationGroup = 'Home Page';
 
     protected static ?string $navigationLabel = 'Hero Carousel';

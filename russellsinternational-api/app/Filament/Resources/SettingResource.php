@@ -16,6 +16,8 @@ class SettingResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationGroup = 'Header, Footer & Settings';
 
     protected static ?int $navigationSort = 1;

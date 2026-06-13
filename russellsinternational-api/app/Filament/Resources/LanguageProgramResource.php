@@ -16,6 +16,8 @@ class LanguageProgramResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-language';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationGroup = 'Languages';
 
     protected static ?int $navigationSort = 1;

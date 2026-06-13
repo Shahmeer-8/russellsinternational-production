@@ -18,6 +18,8 @@ class ContactSubmissionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-envelope';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationGroup = 'Forms & Applications';
 
     protected static ?int $navigationSort = 1;

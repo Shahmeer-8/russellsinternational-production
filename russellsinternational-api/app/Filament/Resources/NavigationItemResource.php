@@ -17,6 +17,8 @@ class NavigationItemResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-bars-3';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationGroup = 'Header, Footer & Settings';
 
     protected static ?int $navigationSort = 2;

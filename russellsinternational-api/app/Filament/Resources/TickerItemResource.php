@@ -16,6 +16,8 @@ class TickerItemResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-megaphone';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationGroup = 'Home Page';
 
     protected static ?string $navigationLabel = 'Announcement Ticker';
