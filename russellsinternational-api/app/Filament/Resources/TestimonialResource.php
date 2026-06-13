@@ -18,6 +18,8 @@ class TestimonialResource extends Resource
 
     protected static ?string $navigationGroup = 'Home Page';
 
+    protected static ?string $navigationLabel = 'Homepage Testimonials';
+
     protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form

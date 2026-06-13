@@ -18,7 +18,7 @@ class CareerApplicationResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationGroup = 'Form Submissions';
+    protected static ?string $navigationGroup = 'Forms & Applications';
 
     protected static ?int $navigationSort = 2;
 

@@ -18,6 +18,8 @@ class WhyChooseUsItemResource extends Resource
 
     protected static ?string $navigationGroup = 'Home Page';
 
+    protected static ?string $navigationLabel = 'Why Choose Us Cards';
+
     protected static ?int $navigationSort = 5;
 
     public static function form(Form $form): Form

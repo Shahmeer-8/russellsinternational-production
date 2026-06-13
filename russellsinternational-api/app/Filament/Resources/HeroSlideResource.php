@@ -18,6 +18,8 @@ class HeroSlideResource extends Resource
 
     protected static ?string $navigationGroup = 'Home Page';
 
+    protected static ?string $navigationLabel = 'Hero Carousel';
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form

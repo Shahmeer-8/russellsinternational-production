@@ -18,6 +18,8 @@ class StatResource extends Resource
 
     protected static ?string $navigationGroup = 'Home Page';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form

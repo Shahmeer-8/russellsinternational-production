@@ -16,7 +16,9 @@ class PageResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-magnifying-glass';
 
-    protected static ?string $navigationGroup = 'Page Content';
+    protected static ?string $navigationGroup = 'Page Heroes & Sections';
+
+    protected static ?string $navigationLabel = 'Page Registry & SEO';
 
     protected static ?int $navigationSort = 1;
 

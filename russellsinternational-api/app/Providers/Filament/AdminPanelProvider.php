@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Widgets\StatsOverview;
+use App\Filament\Widgets\WebsiteContentMap;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -37,16 +38,20 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(app_path('Filament/Pages'), 'App\\Filament\\Pages')
             ->pages([Pages\Dashboard::class])
             ->discoverWidgets(app_path('Filament/Widgets'), 'App\\Filament\\Widgets')
-            ->widgets([StatsOverview::class])
+            ->widgets([
+                StatsOverview::class,
+                WebsiteContentMap::class,
+            ])
             ->navigationGroups([
                 'Home Page',
+                'Page Heroes & Sections',
                 'Skills & Courses',
                 'Study Abroad',
                 'Languages',
                 'Careers',
-                'Events & News',
-                'Form Submissions',
-                'Global Settings',
+                'Events & Gallery',
+                'Forms & Applications',
+                'Header, Footer & Settings',
             ])
             ->middleware([
                 EncryptCookies::class,
