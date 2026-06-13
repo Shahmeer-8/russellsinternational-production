@@ -65,7 +65,7 @@ const Testimonials = () => {
   );
 
   return (
-    <section id="testimonials" className="py-20 md:py-28">
+    <section id="testimonials" className="pt-20 pb-12 md:pt-28 md:pb-16">
       <div
         ref={ref}
         className={`container mx-auto px-4 md:px-8 transition-all duration-700 ${visible ? "opacity-100" : "opacity-0"}`}

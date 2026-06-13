@@ -13,13 +13,7 @@ const CTASection = () => {
   const ctaLabel = sectionText(cta, "cta_label", "");
 
   if (isLoading) {
-    return (
-      <section className="py-20 md:py-28" aria-hidden="true">
-        <div className="container mx-auto px-4 md:px-8">
-          <div className="rounded-3xl h-72 bg-muted animate-pulse" />
-        </div>
-      </section>
-    );
+    return null;
   }
 
   if (!cta || !title) {
