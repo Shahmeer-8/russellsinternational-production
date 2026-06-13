@@ -54,13 +54,13 @@ const Footer = () => {
       <div className="container mx-auto px-4 md:px-8 py-12 md:py-16">
         <div className="grid lg:grid-cols-12 gap-10">
           <div className="lg:col-span-4">
-            <div className="mb-4">
+            <div className="inline-flex rounded-md bg-primary-foreground p-2 mb-4">
               <img
                 src={russellsLogo}
                 alt={siteName ?? "Russell's International"}
-                className="h-20 w-56 object-contain object-left"
-                width={500}
-                height={500}
+                className="h-14 w-48 object-contain object-left"
+                width={483}
+                height={163}
                 loading="lazy"
               />
             </div>

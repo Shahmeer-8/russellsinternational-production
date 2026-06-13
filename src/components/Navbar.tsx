@@ -67,8 +67,8 @@ const Navbar = () => {
             src={russellsLogo}
             alt={siteName}
             className="h-12 w-36 object-contain object-left md:w-44"
-            width={500}
-            height={500}
+            width={483}
+            height={163}
             fetchPriority="high"
           />
           <span className="sr-only">
