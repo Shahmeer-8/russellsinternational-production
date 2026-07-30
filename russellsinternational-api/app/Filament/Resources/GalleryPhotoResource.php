@@ -29,7 +29,7 @@ class GalleryPhotoResource extends Resource
                 ->image()
                 ->disk('public')
                 ->visibility('public')
-                ->required()
+                ->required(fn (string $operation): bool => $operation === 'create')
                 ->directory('gallery')
                 ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/avif', 'image/bmp', 'image/svg+xml'])
                 ->maxSize(2048)
