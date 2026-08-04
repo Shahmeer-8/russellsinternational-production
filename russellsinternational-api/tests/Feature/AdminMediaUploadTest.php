@@ -61,14 +61,14 @@ class AdminMediaUploadTest extends TestCase
     }
 
     /**
-     * A real JPEG, because the CLI PHP build has no GD and UploadedFile::fake()
-     * ->image() cannot generate one.
+     * Self-contained fixture: the CLI PHP build has no GD, so
+     * UploadedFile::fake()->image() cannot generate one.
      */
-    private function jpeg(string $name = 'probe.jpg'): UploadedFile
+    private function jpeg(string $name = 'probe.png'): UploadedFile
     {
-        $source = base_path('database/seed-media/gallery/gallery-lab.jpg');
-
-        return UploadedFile::fake()->createWithContent($name, file_get_contents($source));
+        return UploadedFile::fake()->createWithContent($name, base64_decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII='
+        ));
     }
 
     private function assertUploadIsServable(string $path): void

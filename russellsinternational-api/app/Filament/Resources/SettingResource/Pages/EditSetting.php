@@ -14,4 +14,22 @@ class EditSetting extends EditRecord
     {
         return [Actions\DeleteAction::make()];
     }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        return SettingResource::unfoldValue($data);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return SettingResource::foldValue($data);
+    }
 }
