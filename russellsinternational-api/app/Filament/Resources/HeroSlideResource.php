@@ -62,7 +62,7 @@ class HeroSlideResource extends Resource
                     ->imageEditor()
                     ->downloadable()
                     ->openable()
-                    ->required(),
+                    ->required(fn (string $operation): bool => $operation === 'create'),
                 Forms\Components\TextInput::make('sort_order')
                     ->numeric()->minValue(0)->maxValue(255)->default(0),
                 Forms\Components\Toggle::make('is_active')->default(true),

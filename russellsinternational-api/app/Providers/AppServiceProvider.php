@@ -25,10 +25,15 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * The container's public/ directory is rebuilt on every deploy while media
-     * lives on a persistent volume mounted at the public disk root, so the
-     * public/storage link has to be re-established at runtime. The check is a
-     * pair of stat calls and short-circuits once the link is in place.
+     * Railway rebuilds the container from the image on every deploy, so the
+     * public/storage link never survives — only the volume mounted at the public
+     * disk root does. Recreate it on boot when it is missing.
+     *
+     * Guarding on file_exists() alone is not enough: while public/storage was a
+     * committed real directory the guard always passed, symlink() could never
+     * replace it, and uploads stayed unreachable. ensureLinked() resolves that
+     * case by rescuing the directory's contents onto the disk first. The check
+     * is a pair of stat calls and short-circuits once the link is in place.
      */
     private function ensureMediaIsServable(): void
     {
