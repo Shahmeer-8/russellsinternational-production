@@ -74,12 +74,20 @@ For admin uploads and public media, add a Railway volume to the backend service:
 /app/storage/app/public
 ```
 
+That mount path is the `public` disk root, so uploads survive redeploys. The
+container's `public/` directory is rebuilt on every deploy, so `public/storage`
+is re-linked to the volume automatically on boot. Never commit files into
+`public/storage`: real content there blocks the link, which makes uploads
+unreachable over HTTP and breaks every admin thumbnail. Seed media belongs in
+`russellsinternational-api/database/seed-media`, which `media:install` copies
+onto the disk without overwriting existing uploads.
+
 After the first successful deploy, run:
 
 ```bash
 railway run php artisan migrate --force
 railway run php artisan db:seed --force
-railway run php artisan storage:link
+railway run php artisan media:install
 railway run php artisan optimize:clear
 railway run php artisan config:cache
 railway run php artisan route:cache

@@ -13,7 +13,7 @@
     </testsuites>
     <php>
         <env name="APP_ENV" value="testing"/>
-        <env name="APP_KEY" value="not-secret-test-key-12345678901"/>
+        <env name="APP_KEY" value="not-secret-test-key-123456789012"/>
         <env name="APP_DEBUG" value="false"/>
         <env name="APP_URL" value="http://localhost:8000"/>
         <env name="FRONTEND_URL" value="http://localhost:8080"/>
