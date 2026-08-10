@@ -10,7 +10,7 @@ import type {
   WhyChooseUsItem,
   Course,
   StudyDestination,
-  LanguageProgram,
+  LanguageSection,
   Job,
   Internship,
   Event,
@@ -90,10 +90,15 @@ export function useStudyDestinations() {
 
 // ─── Languages ─────────────────────────────────────────────────────────────────
 
-export function useLanguagePrograms() {
+/**
+ * Every visible tab with its visible programs nested, in one request. Replaces
+ * useLanguagePrograms, which returned a flat list the page had to group itself
+ * using hardcoded rules.
+ */
+export function useLanguageSections() {
   return useQuery({
-    queryKey: ['language-programs'],
-    queryFn: () => api.get<ApiResponse<LanguageProgram[]>>('/language-programs'),
+    queryKey: ['language-sections'],
+    queryFn: () => api.get<ApiResponse<LanguageSection[]>>('/language-sections'),
     staleTime: 10 * 60 * 1000,
   });
 }
