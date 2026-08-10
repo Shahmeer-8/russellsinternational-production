@@ -43,3 +43,24 @@ Object.defineProperty(globalThis, "IntersectionObserver", {
   writable: true,
   value: MockIntersectionObserver,
 });
+
+/**
+ * jsdom has no ResizeObserver. Embla (used by the carousels) constructs one on
+ * mount, so without this any component containing a carousel throws in tests
+ * while working fine in every real browser.
+ */
+class MockResizeObserver implements ResizeObserver {
+  disconnect() {}
+  observe() {}
+  unobserve() {}
+}
+
+Object.defineProperty(globalThis, "ResizeObserver", {
+  writable: true,
+  value: MockResizeObserver,
+});
+
+Object.defineProperty(window, "ResizeObserver", {
+  writable: true,
+  value: MockResizeObserver,
+});

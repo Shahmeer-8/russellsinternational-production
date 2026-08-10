@@ -31,7 +31,8 @@ const PageHero = ({ eyebrow, title, description, image, crumbs }: Props) => (
               {crumbs.map((c, i) => (
                 <span key={i} className="flex items-center gap-1.5">
                   {c.to ? (
-                    <Link to={c.to} className="hover:text-primary-foreground transition-colors">{c.label}</Link>
+                    // py-1.5 lifts this from a 16px-tall tap target to a comfortable one.
+                    <Link to={c.to} className="inline-block py-1.5 hover:text-primary-foreground transition-colors">{c.label}</Link>
                   ) : (
                     <span className="text-primary-foreground">{c.label}</span>
                   )}

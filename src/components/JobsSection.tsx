@@ -3,6 +3,7 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import DetailDrawer from "@/components/DetailDrawer";
 import { Briefcase, MapPin, DollarSign, ArrowRight, Building2 } from "lucide-react";
 import { useJobs } from "@/hooks/api";
+import ResponsiveCardRow from "@/components/ResponsiveCardRow";
 import { useSectionCopy } from "@/hooks/useSectionCopy";
 
 type JobCard = {
@@ -45,9 +46,12 @@ const JobsSection = () => {
               {[...Array(2)].map((_, i) => <div key={i} className="premium-card h-64 animate-pulse" />)}
             </div>
           ) : jobsList.length === 0 ? null : (
-            <div className="grid sm:grid-cols-2 gap-6">
-              {jobsList.map((job) => (
-              <div key={job.title} className="premium-card p-6 group cursor-pointer" onClick={() => openDrawer(job)}>
+            <ResponsiveCardRow
+              gridClassName="grid sm:grid-cols-2 gap-6"
+              items={jobsList.map((job) => ({
+                key: job.title,
+                node: (
+              <div className="premium-card p-6 group cursor-pointer h-full" onClick={() => openDrawer(job)}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                     <Briefcase className="w-5 h-5 text-primary" />
@@ -67,8 +71,9 @@ const JobsSection = () => {
                   View & Apply <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </div>
-              ))}
-            </div>
+                ),
+              }))}
+            />
           )}
         </div>
       </section>

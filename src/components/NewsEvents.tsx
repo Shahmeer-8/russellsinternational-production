@@ -50,7 +50,7 @@ const NewsEvents = () => {
               <h2 className="section-title mt-3">{copy("title", "What's Happening")}</h2>
               <p className="text-muted-foreground mt-3 max-w-md">{copy("subtitle", "Stay updated with our latest events, workshops, and admissions announcements.")}</p>
             </div>
-            <a href="#" className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:gap-3 transition-all shrink-0">
+            <a href="#" className="inline-flex items-center gap-2 py-3 text-sm font-semibold text-accent hover:gap-3 transition-all shrink-0">
               View All News <ArrowRight className="w-4 h-4" />
             </a>
           </div>

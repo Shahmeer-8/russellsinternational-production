@@ -93,7 +93,8 @@ const Footer = () => {
                     key={s.label}
                     href={s.href}
                     aria-label={s.label}
-                    className="w-9 h-9 rounded-full bg-primary-foreground/10 hover:bg-accent flex items-center justify-center transition-colors"
+                    // 44px is the minimum comfortable touch size; these were 36px.
+                    className="w-11 h-11 rounded-full bg-primary-foreground/10 hover:bg-accent flex items-center justify-center transition-colors"
                   >
                     <s.icon className="w-4 h-4" />
                   </a>

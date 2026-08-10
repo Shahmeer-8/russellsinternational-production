@@ -1,6 +1,7 @@
 import { Award } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useWhyChooseUs } from "@/hooks/api";
+import ResponsiveCardRow from "@/components/ResponsiveCardRow";
 import { useSectionCopy } from "@/hooks/useSectionCopy";
 import { resolveIcon } from "@/lib/icons";
 
@@ -31,21 +32,23 @@ const WhyChooseUs = () => {
             {[...Array(6)].map((_, i) => <div key={i} className="premium-card h-48 animate-pulse" />)}
           </div>
         ) : points.length === 0 ? null : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {points.map((p, i) => (
-              <div
-                key={p.title}
-                className="premium-card p-7 group"
-                style={{ transitionDelay: `${i * 80}ms` }}
-              >
-                <div className={`w-12 h-12 rounded-xl ${p.color.split(" ")[0] ?? "bg-primary/10"} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
-                  <p.icon className={`w-6 h-6 ${p.color.split(" ")[1] ?? "text-primary"}`} />
+          <ResponsiveCardRow
+            items={points.map((p, i) => ({
+              key: p.title,
+              node: (
+                <div
+                  className="premium-card p-7 group h-full"
+                  style={{ transitionDelay: `${i * 80}ms` }}
+                >
+                  <div className={`w-12 h-12 rounded-xl ${p.color.split(" ")[0] ?? "bg-primary/10"} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
+                    <p.icon className={`w-6 h-6 ${p.color.split(" ")[1] ?? "text-primary"}`} />
+                  </div>
+                  <h3 className="font-bold text-foreground font-heading text-lg mb-2">{p.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{p.desc}</p>
                 </div>
-                <h3 className="font-bold text-foreground font-heading text-lg mb-2">{p.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{p.desc}</p>
-              </div>
-            ))}
-          </div>
+              ),
+            }))}
+          />
         )}
       </div>
     </section>

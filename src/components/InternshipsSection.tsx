@@ -3,6 +3,7 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import DetailDrawer from "@/components/DetailDrawer";
 import { Rocket, Clock, MapPin, ArrowRight, BadgeCheck } from "lucide-react";
 import { useInternships } from "@/hooks/api";
+import ResponsiveCardRow from "@/components/ResponsiveCardRow";
 import { useSectionCopy } from "@/hooks/useSectionCopy";
 
 type InternshipCard = {
@@ -57,9 +58,12 @@ const InternshipsSection = () => {
               {[...Array(2)].map((_, i) => <div key={i} className="premium-card h-64 animate-pulse" />)}
             </div>
           ) : internshipsList.length === 0 ? null : (
-            <div className="grid sm:grid-cols-2 gap-6">
-              {internshipsList.map((item) => (
-              <div key={item.title} className="premium-card p-6 group cursor-pointer" onClick={() => openDrawer(item)}>
+            <ResponsiveCardRow
+              gridClassName="grid sm:grid-cols-2 gap-6"
+              items={internshipsList.map((item) => ({
+                key: item.title,
+                node: (
+              <div className="premium-card p-6 group cursor-pointer h-full" onClick={() => openDrawer(item)}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
                     <Rocket className="w-5 h-5 text-accent" />
@@ -83,8 +87,9 @@ const InternshipsSection = () => {
                   View Details <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </div>
-              ))}
-            </div>
+                ),
+              }))}
+            />
           )}
         </div>
       </section>

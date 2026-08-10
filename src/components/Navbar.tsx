@@ -88,7 +88,11 @@ const Navbar = () => {
           Start Your Journey
         </Link>
 
-        <button className="lg:hidden p-2" onClick={() => setOpen(!open)} aria-label="Toggle menu">
+        <button
+          className="lg:hidden min-w-11 min-h-11 flex items-center justify-center -mr-2"
+          onClick={() => setOpen(!open)}
+          aria-label="Toggle menu"
+        >
           {open ? <X className="w-5 h-5 text-foreground" /> : <Menu className="w-5 h-5 text-foreground" />}
         </button>
       </div>
