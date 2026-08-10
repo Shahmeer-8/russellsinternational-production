@@ -911,8 +911,20 @@ The frontend's `DEFAULT_PROGRAMS` array renders 8 cards the owner cannot edit. I
 
 **Files:**
 - Create: `russellsinternational-api/database/seeders/LanguageProgramBackfillSeeder.php`
-- Create: `russellsinternational-api/database/migrations/2026_08_05_000003_import_default_language_programs.php`
 - Create: `russellsinternational-api/tests/Feature/LanguageProgramBackfillTest.php`
+
+**Deliberately NOT a migration.** The original plan ran this import from a migration.
+`RefreshDatabase` runs every migration before every test, so that would import 8
+programs into every test database — and `ContentLifecycleTest:212` asserts
+`data.0.title` on `/api/v1/language-programs` with a fixture at `sort_order = 1`,
+which three imported programs also use. Ordering between equal `sort_order` values is
+undefined, so the assertion would become flaky.
+
+It is also unnecessary: after the lorem record is removed, English, German and Korean
+each still hold one real program, so no tab goes empty and no content is lost when
+`DEFAULT_PROGRAMS` is deleted in Task 9. The import is a convenience that hands the
+owner 8 ready-made programs, so it runs once on production as an explicit step in
+Task 10 rather than automatically everywhere.
 
 **Interfaces:**
 - Consumes: `LanguageSection`, `LanguageSectionSeeder` (Task 2); `language_section_id` and `icon_name` columns (Task 3).
@@ -1172,30 +1184,11 @@ class LanguageProgramBackfillSeeder extends Seeder
 Run: `php vendor/bin/phpunit --filter=LanguageProgramBackfillTest`
 Expected: PASS (4 tests).
 
-- [ ] **Step 5: Run the seeder from a migration so production gets it automatically**
+- [ ] **Step 5: Confirm no migration imports this data**
 
-Create `russellsinternational-api/database/migrations/2026_08_05_000003_import_default_language_programs.php`:
-
-```php
-<?php
-
-use Database\Seeders\LanguageProgramBackfillSeeder;
-use Illuminate\Database\Migrations\Migration;
-
-return new class extends Migration
-{
-    public function up(): void
-    {
-        (new LanguageProgramBackfillSeeder())->run();
-    }
-
-    public function down(): void
-    {
-        // Imported content is indistinguishable from owner-authored content once
-        // live, so deleting it on rollback would risk destroying real edits.
-    }
-};
-```
+Run: `grep -rn "LanguageProgramBackfillSeeder" russellsinternational-api/database/migrations/`
+Expected: no matches. The seeder is invoked only by tests and by the explicit
+production step in Task 10.
 
 - [ ] **Step 6: Verify the whole suite**
 
@@ -1205,8 +1198,8 @@ Expected: all green.
 - [ ] **Step 7: Commit**
 
 ```bash
-git add russellsinternational-api/database/seeders/LanguageProgramBackfillSeeder.php russellsinternational-api/database/migrations/2026_08_05_000003_import_default_language_programs.php russellsinternational-api/tests/Feature/LanguageProgramBackfillTest.php
-git commit -m "Import the hardcoded language programs and drop the lorem record"
+git add russellsinternational-api/database/seeders/LanguageProgramBackfillSeeder.php russellsinternational-api/tests/Feature/LanguageProgramBackfillTest.php
+git commit -m "Add a seeder that imports the hardcoded language programs"
 ```
 
 ---
