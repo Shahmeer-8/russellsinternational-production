@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CourseResource\Pages;
 use App\Models\Course;
+use App\Support\AdminChoices;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -31,10 +32,12 @@ class CourseResource extends Resource
                     ->required()
                     ->live(),
                 Forms\Components\TextInput::make('title')->required()->maxLength(200),
-                Forms\Components\TextInput::make('icon_name')
-                    ->label('Lucide Icon Name')
-                    ->required()
-                    ->placeholder('Code, Brain, TrendingUp ...'),
+                Forms\Components\Select::make('icon_name')
+                    ->label('Icon')
+                    ->helperText('Shown on this course card.')
+                    ->options(AdminChoices::icons())
+                    ->searchable()
+                    ->required(),
                 Forms\Components\Textarea::make('description')->rows(3)->maxLength(500),
             ])->columns(2),
 
@@ -45,9 +48,11 @@ class CourseResource extends Resource
                     ->placeholder('PKR 45,000')
                     ->helperText('Leave blank for NAVTTC free courses'),
                 Forms\Components\TextInput::make('tag')->placeholder('Bestseller, New, Popular'),
-                Forms\Components\TextInput::make('color_class')
-                    ->default('bg-blue-50 text-blue-600')
-                    ->label('Tailwind Color Classes'),
+                Forms\Components\Select::make('color_class')
+                    ->label('Colour')
+                    ->helperText('Background colour of the icon badge.')
+                    ->options(AdminChoices::colors())
+                    ->default('bg-blue-50 text-blue-600'),
             ])->columns(3),
 
             Forms\Components\Section::make('Curriculum')->schema([

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\WhyChooseUsItemResource\Pages;
 use App\Models\WhyChooseUsItem;
+use App\Support\AdminChoices;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -27,9 +28,18 @@ class WhyChooseUsItemResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\TextInput::make('icon_name')->required()->maxLength(80),
+            Forms\Components\Select::make('icon_name')
+                ->label('Icon')
+                ->helperText('Shown next to this reason on the home page.')
+                ->options(AdminChoices::icons())
+                ->searchable()
+                ->required(),
             Forms\Components\TextInput::make('title')->required()->maxLength(200),
-            Forms\Components\TextInput::make('color_class')->default('bg-blue-50 text-blue-600'),
+            Forms\Components\Select::make('color_class')
+                ->label('Colour')
+                ->helperText('Background colour of the icon badge.')
+                ->options(AdminChoices::colors())
+                ->default('bg-blue-50 text-blue-600'),
             Forms\Components\Textarea::make('description')->required()->rows(3)->columnSpanFull(),
             Forms\Components\TextInput::make('sort_order')->numeric()->minValue(0)->maxValue(255)->default(0),
             Forms\Components\Toggle::make('is_active')->default(true),

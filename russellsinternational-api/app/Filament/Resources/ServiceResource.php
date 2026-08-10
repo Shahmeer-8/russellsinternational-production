@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ServiceResource\Pages;
 use App\Models\Service;
+use App\Support\AdminChoices;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -25,9 +26,18 @@ class ServiceResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\TextInput::make('icon_name')->required()->maxLength(80),
+            Forms\Components\Select::make('icon_name')
+                ->label('Icon')
+                ->helperText('Shown on this service card.')
+                ->options(AdminChoices::icons())
+                ->searchable()
+                ->required(),
             Forms\Components\TextInput::make('title')->required()->maxLength(200),
-            Forms\Components\TextInput::make('color_class')->default('bg-blue-50 text-blue-600'),
+            Forms\Components\Select::make('color_class')
+                ->label('Colour')
+                ->helperText('Background colour of the icon badge.')
+                ->options(AdminChoices::colors())
+                ->default('bg-blue-50 text-blue-600'),
             Forms\Components\Textarea::make('description')->required()->rows(3)->columnSpanFull(),
             Forms\Components\Textarea::make('details')->required()->rows(5)->columnSpanFull(),
             Forms\Components\Repeater::make('key_benefits')
