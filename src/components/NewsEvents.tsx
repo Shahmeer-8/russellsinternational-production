@@ -3,6 +3,7 @@ import { Calendar, ArrowRight } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import DetailDrawer from "@/components/DetailDrawer";
 import { useEvents } from "@/hooks/api";
+import { useSectionCopy } from "@/hooks/useSectionCopy";
 
 type EventCard = {
   image: string | null;
@@ -15,6 +16,7 @@ type EventCard = {
 };
 
 const NewsEvents = () => {
+  const copy = useSectionCopy("events", "news");
   const { ref, visible } = useScrollReveal();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selected, setSelected] = useState<EventCard | null>(null);
@@ -44,9 +46,9 @@ const NewsEvents = () => {
         >
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-14 gap-4">
             <div>
-              <span className="section-label">News & Events</span>
-              <h2 className="section-title mt-3">What's Happening</h2>
-              <p className="text-muted-foreground mt-3 max-w-md">Stay updated with our latest events, workshops, and admissions announcements.</p>
+              <span className="section-label">{copy("eyebrow", "News & Events")}</span>
+              <h2 className="section-title mt-3">{copy("title", "What's Happening")}</h2>
+              <p className="text-muted-foreground mt-3 max-w-md">{copy("subtitle", "Stay updated with our latest events, workshops, and admissions announcements.")}</p>
             </div>
             <a href="#" className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:gap-3 transition-all shrink-0">
               View All News <ArrowRight className="w-4 h-4" />

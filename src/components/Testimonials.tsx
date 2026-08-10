@@ -1,6 +1,7 @@
 import { Star, Quote, PlayCircle } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useTestimonials } from "@/hooks/api";
+import { useSectionCopy } from "@/hooks/useSectionCopy";
 import {
   Carousel,
   CarouselContent,
@@ -24,6 +25,7 @@ const extractYoutubeId = (value: string) => {
 };
 
 const Testimonials = () => {
+  const copy = useSectionCopy("home", "testimonials");
   const { ref, visible } = useScrollReveal();
 
   const { data: testimonialsData, isLoading } = useTestimonials();
@@ -90,8 +92,8 @@ const Testimonials = () => {
         className={`container mx-auto px-4 md:px-8 transition-all duration-700 ${visible ? "opacity-100" : "opacity-0"}`}
       >
         <div className="text-center mb-14">
-          <span className="section-label">Student Stories</span>
-          <h2 className="section-title mt-3">Real Success, Real People</h2>
+          <span className="section-label">{copy("eyebrow", "Student Stories")}</span>
+          <h2 className="section-title mt-3">{copy("title", "Real Success, Real People")}</h2>
           <p className="text-muted-foreground mt-4 max-w-lg mx-auto">{videoList.length > 0 ? "Watch and read how our students transformed their futures with us." : "Read how our students transformed their futures with us."}</p>
         </div>
 

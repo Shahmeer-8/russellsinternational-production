@@ -5,6 +5,7 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import DetailDrawer from "@/components/DetailDrawer";
 import { useCourses } from "@/hooks/api";
 import { resolveIcon } from "@/lib/icons";
+import { useSectionCopy } from "@/hooks/useSectionCopy";
 
 type CourseCard = {
   icon: ElementType;
@@ -20,6 +21,7 @@ type CourseCard = {
 };
 
 const FeaturedCourses = () => {
+  const copy = useSectionCopy("skills", "courses");
   const { ref, visible } = useScrollReveal();
   const [tab, setTab] = useState<"paid" | "navttc">("paid");
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -58,9 +60,9 @@ const FeaturedCourses = () => {
           className={`container mx-auto px-4 md:px-8 transition-all duration-700 ${visible ? "opacity-100" : "opacity-0"}`}
         >
           <div className="text-center mb-10">
-            <span className="section-label">Featured Programs</span>
-            <h2 className="section-title mt-3">Elevate Your Skillset</h2>
-            <p className="text-muted-foreground mt-4 max-w-lg mx-auto">Industry-aligned training programs designed to make you job-ready from day one.</p>
+            <span className="section-label">{copy("eyebrow", "Featured Programs")}</span>
+            <h2 className="section-title mt-3">{copy("title", "Elevate Your Skillset")}</h2>
+            <p className="text-muted-foreground mt-4 max-w-lg mx-auto">{copy("subtitle", "Industry-aligned training programs designed to make you job-ready from day one.")}</p>
           </div>
 
           {/* Tab Switcher */}

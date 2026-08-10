@@ -3,6 +3,7 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import DetailDrawer from "@/components/DetailDrawer";
 import { Briefcase, MapPin, DollarSign, ArrowRight, Building2 } from "lucide-react";
 import { useJobs } from "@/hooks/api";
+import { useSectionCopy } from "@/hooks/useSectionCopy";
 
 type JobCard = {
   title: string;
@@ -15,6 +16,7 @@ type JobCard = {
 };
 
 const JobsSection = () => {
+  const copy = useSectionCopy("careers", "jobs");
   const { ref, visible } = useScrollReveal();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selected, setSelected] = useState<JobCard | null>(null);
@@ -33,9 +35,9 @@ const JobsSection = () => {
           className={`container mx-auto px-4 md:px-8 transition-all duration-700 ${visible ? "opacity-100" : "opacity-0"}`}
         >
           <div className="text-center mb-14">
-            <span className="section-label">Career Opportunities</span>
-            <h2 className="section-title mt-3">Join Our Team or Our Partners</h2>
-            <p className="text-muted-foreground mt-4 max-w-lg mx-auto">Explore open positions at Russell's International and our partner organizations.</p>
+            <span className="section-label">{copy("eyebrow", "Career Opportunities")}</span>
+            <h2 className="section-title mt-3">{copy("title", "Join Our Team or Our Partners")}</h2>
+            <p className="text-muted-foreground mt-4 max-w-lg mx-auto">{copy("subtitle", "Explore open positions at Russell's International and our partner organizations.")}</p>
           </div>
 
           {isLoading ? (

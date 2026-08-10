@@ -1,12 +1,16 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import LanguagesSection from "@/components/LanguagesSection";
 import type { LanguageSection } from "@/types/api";
 
 const mockUseLanguageSections = vi.fn();
+const mockUsePageSections = vi.fn();
 
 vi.mock("@/hooks/api", () => ({
   useLanguageSections: () => mockUseLanguageSections(),
+  // The section heading is admin-editable too; returning nothing exercises the
+  // hardcoded fallbacks, which is what a fresh install without the seed sees.
+  usePageSections: () => mockUsePageSections(),
 }));
 
 vi.mock("@/hooks/useScrollReveal", () => ({
@@ -43,6 +47,34 @@ function section(overrides: Partial<LanguageSection> = {}): LanguageSection {
 }
 
 describe("LanguagesSection", () => {
+  beforeEach(() => {
+    mockUsePageSections.mockReturnValue({ data: { data: {} }, isLoading: false });
+  });
+
+  it("falls back to the shipped heading when the admin has not set one", () => {
+    mockUseLanguageSections.mockReturnValue({ data: { data: [section()] }, isLoading: false });
+
+    render(<LanguagesSection />);
+
+    expect(screen.getByText("Speak the World")).toBeTruthy();
+    expect(screen.getByText("Language Programs")).toBeTruthy();
+  });
+
+  it("uses the admin heading when one is set", () => {
+    mockUseLanguageSections.mockReturnValue({ data: { data: [section()] }, isLoading: false });
+    mockUsePageSections.mockReturnValue({
+      data: { data: { intro: { eyebrow: "Admin Eyebrow", title: "Admin Title", subtitle: "Admin subtitle." } } },
+      isLoading: false,
+    });
+
+    render(<LanguagesSection />);
+
+    expect(screen.getByText("Admin Title")).toBeTruthy();
+    expect(screen.getByText("Admin Eyebrow")).toBeTruthy();
+    expect(screen.getByText("Admin subtitle.")).toBeTruthy();
+    expect(screen.queryByText("Speak the World")).toBeNull();
+  });
+
   it("renders one tab per section from the API", () => {
     mockUseLanguageSections.mockReturnValue({
       data: {

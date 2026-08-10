@@ -3,6 +3,7 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import DetailDrawer from "@/components/DetailDrawer";
 import { Rocket, Clock, MapPin, ArrowRight, BadgeCheck } from "lucide-react";
 import { useInternships } from "@/hooks/api";
+import { useSectionCopy } from "@/hooks/useSectionCopy";
 
 type InternshipCard = {
   title: string;
@@ -17,6 +18,7 @@ type InternshipCard = {
 };
 
 const InternshipsSection = () => {
+  const copy = useSectionCopy("careers", "internships");
   const { ref, visible } = useScrollReveal();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selected, setSelected] = useState<InternshipCard | null>(null);
@@ -37,10 +39,10 @@ const InternshipsSection = () => {
         >
           <div className="grid lg:grid-cols-2 gap-12 items-center mb-14">
             <div>
-              <span className="section-label">Internships</span>
-              <h2 className="section-title mt-3 mb-5">Gain Real-World Experience</h2>
+              <span className="section-label">{copy("eyebrow", "Internships")}</span>
+              <h2 className="section-title mt-3 mb-5">{copy("title", "Gain Real-World Experience")}</h2>
               <p className="text-muted-foreground leading-relaxed">
-                Bridge the gap between learning and working. Our internship programs place you in real projects with industry mentors, giving you hands-on experience that employers value.
+                {copy("subtitle", "Bridge the gap between learning and working. Our internship programs place you in real projects with industry mentors, giving you hands-on experience that employers value.")}
               </p>
             </div>
             {introImage && (

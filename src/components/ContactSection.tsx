@@ -2,8 +2,10 @@ import { Mail, Phone, MapPin, Send } from "lucide-react";
 import { useState } from "react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useSettings, useSubmitContact } from "@/hooks/api";
+import { useSectionCopy } from "@/hooks/useSectionCopy";
 
 const ContactSection = () => {
+  const copy = useSectionCopy("home", "contact");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const { ref, visible } = useScrollReveal();
@@ -37,10 +39,10 @@ const ContactSection = () => {
       >
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           <div>
-            <span className="section-label">Get In Touch</span>
-            <h2 className="section-title mt-3 mb-5">Ready to Take the Next Step?</h2>
+            <span className="section-label">{copy("eyebrow", "Get In Touch")}</span>
+            <h2 className="section-title mt-3 mb-5">{copy("title", "Ready to Take the Next Step?")}</h2>
             <p className="text-muted-foreground mb-8 leading-relaxed">
-              Fill in the form and our team will get back to you within 24 hours with personalized guidance.
+              {copy("subtitle", "Fill in the form and our team will get back to you within 24 hours with personalized guidance.")}
             </p>
             <div className="space-y-4">
               {[

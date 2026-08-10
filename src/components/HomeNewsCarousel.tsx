@@ -8,6 +8,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useEvents } from "@/hooks/api";
+import { useSectionCopy } from "@/hooks/useSectionCopy";
 
 type Tag = "Event" | "News" | "Workshop";
 
@@ -18,6 +19,7 @@ const tagColor: Record<Tag, string> = {
 };
 
 const HomeNewsCarousel = () => {
+  const copy = useSectionCopy("home", "news");
   const { data, isLoading } = useEvents();
   const displayItems = (data?.data?.data ?? []).slice(0, 8).map((event) => ({
     image: event.image_url,
@@ -31,10 +33,10 @@ const HomeNewsCarousel = () => {
   <section className="py-20 md:py-28 bg-background">
     <div className="container mx-auto px-4 md:px-8">
       <div className="text-center mb-12">
-        <span className="section-label">Stay Updated</span>
-        <h2 className="section-title mt-3">Latest News & Events</h2>
+        <span className="section-label">{copy("eyebrow", "Stay Updated")}</span>
+        <h2 className="section-title mt-3">{copy("title", "Latest News & Events")}</h2>
         <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
-          Stay updated with our latest activities, events, and announcements.
+          {copy("subtitle", "Stay updated with our latest activities, events, and announcements.")}
         </p>
       </div>
 
