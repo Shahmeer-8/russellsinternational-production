@@ -1,22 +1,13 @@
-import { Award, Users, ShieldCheck, Headphones, TrendingUp, Globe } from "lucide-react";
-import type { ElementType } from "react";
+import { Award } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useWhyChooseUs } from "@/hooks/api";
-
-const ICON_MAP: Record<string, ElementType> = {
-  Award,
-  Users,
-  ShieldCheck,
-  Headphones,
-  TrendingUp,
-  Globe,
-};
+import { resolveIcon } from "@/lib/icons";
 
 const WhyChooseUs = () => {
   const { ref, visible } = useScrollReveal();
   const { data, isLoading } = useWhyChooseUs();
   const points = (data?.data ?? []).map((item) => ({
-    icon: ICON_MAP[item.icon_name] ?? Award,
+    icon: resolveIcon(item.icon_name, Award),
     title: item.title,
     desc: item.description,
     color: item.color_class,

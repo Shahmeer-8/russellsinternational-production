@@ -1,9 +1,10 @@
-import { Code, Brain, TrendingUp, Shield, Palette, Server, Clock, Users, ArrowRight, BadgeCheck, Crown } from "lucide-react";
+import { Code, Clock, Users, ArrowRight, BadgeCheck, Crown } from "lucide-react";
 import type { ElementType } from "react";
 import { useState } from "react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import DetailDrawer from "@/components/DetailDrawer";
 import { useCourses } from "@/hooks/api";
+import { resolveIcon } from "@/lib/icons";
 
 type CourseCard = {
   icon: ElementType;
@@ -18,8 +19,6 @@ type CourseCard = {
   highlights: string[];
 };
 
-const ICON_MAP: Record<string, ElementType> = { Code, Brain, TrendingUp, Shield, Palette, Server };
-
 const FeaturedCourses = () => {
   const { ref, visible } = useScrollReveal();
   const [tab, setTab] = useState<"paid" | "navttc">("paid");
@@ -31,7 +30,7 @@ const FeaturedCourses = () => {
 
   const mapCourse = (c: import("@/types/api").Course): CourseCard => ({
     ...c,
-    icon: ICON_MAP[c.icon_name] ?? Code,
+    icon: resolveIcon(c.icon_name, Code),
     color: c.color_class ?? '',
     description: c.description ?? '',
     students: c.students_count ?? '',
