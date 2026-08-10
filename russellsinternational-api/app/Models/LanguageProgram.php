@@ -5,15 +5,16 @@ namespace App\Models;
 use App\Models\Concerns\NormalizesJsonLists;
 use App\Support\Media;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class LanguageProgram extends Model
 {
     use NormalizesJsonLists;
 
     protected $fillable = [
-        'flag_emoji', 'language_code', 'title', 'duration',
+        'language_section_id', 'flag_emoji', 'language_code', 'title', 'duration',
         'badge', 'description', 'benefits', 'color_class',
-        'image', 'sort_order', 'is_active',
+        'icon_name', 'image', 'sort_order', 'is_active',
     ];
 
     protected $casts = [
@@ -27,6 +28,11 @@ class LanguageProgram extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true)->orderBy('sort_order');
+    }
+
+    public function section(): BelongsTo
+    {
+        return $this->belongsTo(LanguageSection::class, 'language_section_id');
     }
 
     public function getImageUrlAttribute(): ?string
