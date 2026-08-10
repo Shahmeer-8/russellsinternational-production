@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\LanguageProgramResource\Pages;
 use App\Models\LanguageProgram;
+use App\Support\AdminChoices;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -25,20 +26,18 @@ class LanguageProgramResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
+            Forms\Components\Select::make('language_section_id')
+                ->label('Language section')
+                ->helperText('Which tab on the Languages page this program appears under.')
+                ->relationship('section', 'label')
+                ->searchable()
+                ->preload()
+                ->required(),
             Forms\Components\TextInput::make('flag_emoji')
-                ->label('Short Code / Flag')
+                ->label('Internal short code')
+                ->helperText('For your own reference in this list only. Not shown on the website.')
                 ->required()
                 ->placeholder('GB'),
-            Forms\Components\Select::make('language_code')
-                ->label('Language Section')
-                ->options([
-                    'english' => 'English Tests',
-                    'german' => 'German Tests',
-                    'korean' => 'Korean Tests',
-                    'ielts' => 'IELTS (legacy English)',
-                ])
-                ->helperText('Choose the page section this program appears under.')
-                ->required(),
             Forms\Components\TextInput::make('title')
                 ->label('Test / Program Name')
                 ->required()
@@ -46,12 +45,26 @@ class LanguageProgramResource extends Resource
                 ->maxLength(200),
             Forms\Components\TextInput::make('duration')->required()->placeholder('8 Weeks'),
             Forms\Components\TextInput::make('badge')->required()->placeholder('Most Popular'),
-            Forms\Components\TextInput::make('color_class')->default('bg-blue-50 text-blue-600'),
+            Forms\Components\Select::make('color_class')
+                ->label('Colour')
+                ->helperText("Background colour of this card's icon badge.")
+                ->options(AdminChoices::colors())
+                ->default('bg-blue-50 text-blue-600'),
+            Forms\Components\Select::make('icon_name')
+                ->label('Icon')
+                ->helperText("Leave blank to reuse the section's icon.")
+                ->options(AdminChoices::icons())
+                ->searchable(),
             Forms\Components\Textarea::make('description')->required()->rows(3)->columnSpanFull(),
             Forms\Components\Repeater::make('benefits')
                 ->label('What is included')
+                ->helperText('Bullet points shown when a visitor opens this program. Add as many as you need.')
                 ->schema([Forms\Components\TextInput::make('item')->required()])
-                ->defaultItems(4)
+                // One row, not four. Every row's text is required, so shipping four
+                // meant the owner could not save until all four were filled in or
+                // three were deleted by hand.
+                ->defaultItems(1)
+                ->addActionLabel('Add another point')
                 ->collapsible()
                 ->columnSpanFull(),
             Forms\Components\FileUpload::make('image')
@@ -76,21 +89,16 @@ class LanguageProgramResource extends Resource
             ->reorderable('sort_order')
             ->columns([
                 Tables\Columns\TextColumn::make('flag_emoji')->label('Code'),
-                Tables\Columns\TextColumn::make('language_code')->label('Section')->badge(),
+                Tables\Columns\TextColumn::make('section.label')->label('Section')->badge()->sortable(),
                 Tables\Columns\TextColumn::make('title')->searchable(),
                 Tables\Columns\TextColumn::make('duration'),
                 Tables\Columns\TextColumn::make('badge'),
                 Tables\Columns\ToggleColumn::make('is_active'),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('language_code')
-                    ->label('Language Section')
-                    ->options([
-                        'english' => 'English Tests',
-                        'ielts' => 'IELTS (legacy English)',
-                        'german' => 'German Tests',
-                        'korean' => 'Korean Tests',
-                    ]),
+                Tables\Filters\SelectFilter::make('language_section_id')
+                    ->label('Section')
+                    ->relationship('section', 'label'),
             ])
             ->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);

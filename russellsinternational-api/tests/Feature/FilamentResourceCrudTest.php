@@ -69,6 +69,7 @@ use App\Models\HeroSlide;
 use App\Models\Internship;
 use App\Models\Job;
 use App\Models\LanguageProgram;
+use App\Models\LanguageSection;
 use App\Models\NavigationItem;
 use App\Models\Page;
 use App\Models\PageSection;
@@ -188,6 +189,15 @@ class FilamentResourceCrudTest extends TestCase
     /**
      * @return array<int, array{model: class-string<Model>, list: class-string, create: class-string, edit: class-string, lookupField: string, lookupValue: string, createData: array<string, mixed>, editData: array<string, mixed>, databaseAfterEdit: array<string, mixed>}>
      */
+    /**
+     * The language sections are seeded by migration, so their ids are looked up
+     * rather than hardcoded.
+     */
+    private function sectionId(string $slug): ?int
+    {
+        return LanguageSection::query()->where('slug', $slug)->value('id');
+    }
+
     private function resourceCases(): array
     {
         return [
@@ -308,9 +318,9 @@ class FilamentResourceCrudTest extends TestCase
                 'edit' => EditLanguageProgram::class,
                 'lookupField' => 'title',
                 'lookupValue' => 'QA_TEST_LANGUAGE_ADMIN',
-                'createData' => ['flag_emoji' => 'QA', 'language_code' => 'ielts', 'title' => 'QA_TEST_LANGUAGE_ADMIN', 'duration' => '1 Week', 'badge' => 'QA', 'color_class' => 'bg-blue-50 text-blue-600', 'description' => 'QA description', 'benefits' => [['item' => 'QA benefit']], 'sort_order' => 1, 'is_active' => true],
-                'editData' => ['flag_emoji' => 'QA', 'language_code' => 'german', 'title' => 'QA_TEST_LANGUAGE_ADMIN_UPDATED', 'duration' => '2 Weeks', 'badge' => 'QA2', 'color_class' => 'bg-blue-50 text-blue-600', 'description' => 'QA updated', 'benefits' => [['item' => 'QA benefit updated']], 'sort_order' => 2, 'is_active' => false],
-                'databaseAfterEdit' => ['title' => 'QA_TEST_LANGUAGE_ADMIN_UPDATED', 'language_code' => 'german', 'sort_order' => 2, 'is_active' => false],
+                'createData' => ['flag_emoji' => 'QA', 'language_section_id' => $this->sectionId('english'), 'title' => 'QA_TEST_LANGUAGE_ADMIN', 'duration' => '1 Week', 'badge' => 'QA', 'color_class' => 'bg-blue-50 text-blue-600', 'description' => 'QA description', 'benefits' => [['item' => 'QA benefit']], 'sort_order' => 1, 'is_active' => true],
+                'editData' => ['flag_emoji' => 'QA', 'language_section_id' => $this->sectionId('german'), 'title' => 'QA_TEST_LANGUAGE_ADMIN_UPDATED', 'duration' => '2 Weeks', 'badge' => 'QA2', 'color_class' => 'bg-blue-50 text-blue-600', 'description' => 'QA updated', 'benefits' => [['item' => 'QA benefit updated']], 'sort_order' => 2, 'is_active' => false],
+                'databaseAfterEdit' => ['title' => 'QA_TEST_LANGUAGE_ADMIN_UPDATED', 'language_section_id' => $this->sectionId('german'), 'sort_order' => 2, 'is_active' => false],
             ],
             [
                 'model' => StudyDestination::class,

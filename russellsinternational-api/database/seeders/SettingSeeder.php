@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\LanguageProgram;
+use App\Models\LanguageSection;
 use App\Models\Page;
 use App\Models\Service;
 use App\Models\Setting;
@@ -103,14 +104,24 @@ class SettingSeeder extends Seeder
         }
 
         // ── Language programs ────────────────────────────────────────────
+        // Sections own the grouping, so each program is filed under one by slug.
         $languages = [
-            ['flag_emoji' => '🇬🇧', 'language_code' => 'ielts',  'title' => 'IELTS Preparation',      'duration' => '8 Weeks',          'badge' => 'Most Popular', 'description' => 'Comprehensive coaching across all four IELTS modules with weekly mock tests.',             'color_class' => 'bg-blue-50 text-blue-600',   'benefits' => ['British Council-trained instructors', 'Weekly full-length mocks', 'Personalized band score strategy', 'Speaking practice sessions']],
-            ['flag_emoji' => '🇩🇪', 'language_code' => 'german', 'title' => 'German Language (A1–B2)', 'duration' => '12 Weeks per level', 'badge' => 'Visa-Ready',   'description' => 'Goethe-aligned curriculum to prepare you for studies, work, and life in Germany.',        'color_class' => 'bg-amber-50 text-amber-600',  'benefits' => ['Goethe Institute syllabus', 'Native-speaking conversation labs', 'Exam preparation included', 'Pathway to Ausbildung & study']],
-            ['flag_emoji' => '🇰🇷', 'language_code' => 'korean', 'title' => 'Korean Language (TOPIK)', 'duration' => '10 Weeks',          'badge' => 'EPS-TOPIK Ready', 'description' => 'From Hangul basics to TOPIK exam mastery — perfect for Korea study or EPS programs.', 'color_class' => 'bg-rose-50 text-rose-600',    'benefits' => ['TOPIK I & II preparation', 'Cultural immersion sessions', 'EPS exam support', 'Real conversation practice']],
+            ['slug' => 'english', 'flag_emoji' => '🇬🇧', 'icon_name' => 'Languages',     'title' => 'IELTS Preparation',      'duration' => '8 Weeks',           'badge' => 'Most Popular',    'description' => 'Comprehensive coaching across all four IELTS modules with weekly mock tests.',        'color_class' => 'bg-blue-50 text-blue-600',  'benefits' => ['British Council-trained instructors', 'Weekly full-length mocks', 'Personalized band score strategy', 'Speaking practice sessions']],
+            ['slug' => 'german',  'flag_emoji' => '🇩🇪', 'icon_name' => 'BookOpenText',  'title' => 'German Language (A1–B2)', 'duration' => '12 Weeks per level', 'badge' => 'Visa-Ready',      'description' => 'Goethe-aligned curriculum to prepare you for studies, work, and life in Germany.',    'color_class' => 'bg-amber-50 text-amber-600', 'benefits' => ['Goethe Institute syllabus', 'Native-speaking conversation labs', 'Exam preparation included', 'Pathway to Ausbildung & study']],
+            ['slug' => 'korean',  'flag_emoji' => '🇰🇷', 'icon_name' => 'MessageCircle', 'title' => 'Korean Language (TOPIK)', 'duration' => '10 Weeks',           'badge' => 'EPS-TOPIK Ready', 'description' => 'From Hangul basics to TOPIK exam mastery — perfect for Korea study or EPS programs.', 'color_class' => 'bg-rose-50 text-rose-600',   'benefits' => ['TOPIK I & II preparation', 'Cultural immersion sessions', 'EPS exam support', 'Real conversation practice']],
         ];
 
+        (new LanguageSectionSeeder)->run();
+
         foreach ($languages as $i => $lang) {
-            LanguageProgram::create(array_merge($lang, ['sort_order' => $i + 1, 'is_active' => true]));
+            $slug = $lang['slug'];
+            unset($lang['slug']);
+
+            LanguageProgram::create(array_merge($lang, [
+                'language_section_id' => LanguageSection::query()->where('slug', $slug)->value('id'),
+                'sort_order' => $i + 1,
+                'is_active' => true,
+            ]));
         }
 
         // ── Pages SEO ────────────────────────────────────────────────────

@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\HeroSlideController;
 use App\Http\Controllers\Api\InternshipController;
 use App\Http\Controllers\Api\JobController;
 use App\Http\Controllers\Api\LanguageProgramController;
+use App\Http\Controllers\Api\LanguageSectionController;
 use App\Http\Controllers\Api\NavigationController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\PageSectionController;
@@ -50,6 +51,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/study-destinations/{id}', [StudyDestinationController::class, 'show']);
 
     // ── Languages ───────────────────────────────────────────────────────
+    Route::get('/language-sections', [LanguageSectionController::class,  'index']);
     Route::get('/language-programs', [LanguageProgramController::class,  'index']);
     Route::get('/language-programs/{id}', [LanguageProgramController::class,  'show']);
 

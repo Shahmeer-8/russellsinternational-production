@@ -278,13 +278,21 @@ class LanguageSectionModelTest extends TestCase
 
     public function test_active_scope_hides_inactive_and_sorts_by_order(): void
     {
-        LanguageSection::create(['label' => 'Third', 'heading' => 'H', 'sort_order' => 30]);
-        LanguageSection::create(['label' => 'Hidden', 'heading' => 'H', 'sort_order' => 1, 'is_active' => false]);
-        LanguageSection::create(['label' => 'First', 'heading' => 'H', 'sort_order' => 10]);
+        LanguageSection::create(['label' => 'Zeta Scope', 'heading' => 'H', 'sort_order' => 30]);
+        LanguageSection::create(['label' => 'Hidden Scope', 'heading' => 'H', 'sort_order' => 1, 'is_active' => false]);
+        LanguageSection::create(['label' => 'Alpha Scope', 'heading' => 'H', 'sort_order' => 10]);
 
-        $labels = LanguageSection::active()->pluck('label')->all();
+        // Scoped to this test's own records: the Task 3 migration seeds the three
+        // real sections into every test database, so an exact whole-table
+        // assertion here would be brittle.
+        $labels = LanguageSection::active()
+            ->get()
+            ->pluck('label')
+            ->filter(fn (string $label) => str_contains($label, 'Scope'))
+            ->values()
+            ->all();
 
-        $this->assertSame(['First', 'Third'], $labels);
+        $this->assertSame(['Alpha Scope', 'Zeta Scope'], $labels);
     }
 
     public function test_seeder_creates_the_three_current_sections_and_is_idempotent(): void
@@ -510,14 +518,31 @@ git commit -m "Add language sections table, model and seed"
 
 **Files:**
 - Create: `russellsinternational-api/database/migrations/2026_08_05_000002_add_language_section_id_to_language_programs.php`
+- Create: `russellsinternational-api/app/Support/LegacyLanguageCodeMap.php`
+- Create: `russellsinternational-api/database/seeders/LanguageProgramSectionBackfillSeeder.php`
 - Modify: `russellsinternational-api/app/Models/LanguageProgram.php` (add `icon_name` + `language_section_id` to `$fillable`, add `section()` relation)
 - Create: `russellsinternational-api/tests/Feature/LanguageSectionBackfillTest.php`
 
 **Interfaces:**
 - Consumes: `App\Models\LanguageSection` and `LanguageSectionSeeder` from Task 2.
-- Produces: `language_programs.language_section_id` (nullable FK, `nullOnDelete`), `language_programs.icon_name` (nullable), and `LanguageProgram::section(): BelongsTo`.
+- Produces: `language_programs.language_section_id` (nullable FK, `nullOnDelete`), `language_programs.icon_name` (nullable), `LanguageProgram::section(): BelongsTo`, `LegacyLanguageCodeMap::slugFor(?string $code): string`, and `Database\Seeders\LanguageProgramSectionBackfillSeeder`.
 
 `icon_name` is added here because the imported demo programs in Task 4 each had their own icon in the old hardcoded array, and `courses`/`services` already use this column name. When it is null the frontend falls back to the section's icon, which is exactly today's behaviour.
+
+**Why the backfill is a seeder and the mapping is its own class.** Three constraints
+force this shape, and burying the logic in the migration's `up()` violates all three:
+
+- `RefreshDatabase` runs every migration before each test, so a test cannot re-run a
+  migration to exercise it — `artisan migrate` only runs *pending* migrations and
+  would be a silent no-op.
+- Task 5 drops `language_code`, so any test that writes that column stops compiling
+  the moment Task 5 lands. The mapping must be testable without the column.
+- Seeding sections from inside a migration would leave all three sections present in
+  every test, breaking assertions that count sections.
+
+So: `LegacyLanguageCodeMap` is a pure function (testable forever),
+`LanguageProgramSectionBackfillSeeder` is directly callable and idempotent, and the
+migration only calls them. Section seeding stays out of this migration.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -607,35 +632,13 @@ Create `russellsinternational-api/database/migrations/2026_08_05_000002_add_lang
 ```php
 <?php
 
-use App\Models\LanguageSection;
-use Database\Seeders\LanguageSectionSeeder;
+use Database\Seeders\LanguageProgramSectionBackfillSeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Legacy `language_code` values mapped to the slug of the section that now
-     * owns them. `ielts` folds into English because that is already how the
-     * frontend rendered it.
-     */
-    private const CODE_TO_SLUG = [
-        'english' => 'english',
-        'ielts' => 'english',
-        'pte' => 'english',
-        'toefl' => 'english',
-        'languagecert' => 'english',
-        'german' => 'german',
-        'goethe' => 'german',
-        'testdaf' => 'german',
-        'telc' => 'german',
-        'korean' => 'korean',
-        'topik' => 'korean',
-        'eps-topik' => 'korean',
-    ];
-
     public function up(): void
     {
         Schema::table('language_programs', function (Blueprint $table) {
@@ -652,23 +655,10 @@ return new class extends Migration
             }
         });
 
-        // The sections must exist before anything can point at them.
-        (new LanguageSectionSeeder())->run();
-
-        if (! Schema::hasColumn('language_programs', 'language_code')) {
-            return;
-        }
-
-        $slugToId = LanguageSection::query()->pluck('id', 'slug');
-        $fallbackId = $slugToId['english'] ?? LanguageSection::query()->orderBy('sort_order')->value('id');
-
-        foreach (DB::table('language_programs')->whereNull('language_section_id')->get(['id', 'language_code']) as $program) {
-            $slug = self::CODE_TO_SLUG[strtolower((string) $program->language_code)] ?? null;
-
-            DB::table('language_programs')
-                ->where('id', $program->id)
-                ->update(['language_section_id' => $slug ? ($slugToId[$slug] ?? $fallbackId) : $fallbackId]);
-        }
+        // Seeds the sections it needs, then maps each program onto one. Kept in a
+        // seeder so tests can call it directly — re-running this migration is not
+        // possible once it has been applied.
+        (new LanguageProgramSectionBackfillSeeder())->run();
     }
 
     public function down(): void
@@ -684,6 +674,106 @@ return new class extends Migration
         });
     }
 };
+```
+
+Create `russellsinternational-api/app/Support/LegacyLanguageCodeMap.php`:
+
+```php
+<?php
+
+namespace App\Support;
+
+/**
+ * Maps the retired `language_code` values onto section slugs. `ielts`, `pte`,
+ * `toefl` and `languagecert` fold into English because that is already how the
+ * frontend grouped them before sections existed.
+ *
+ * Kept as a pure map so it stays testable after the column is dropped.
+ */
+class LegacyLanguageCodeMap
+{
+    private const CODE_TO_SLUG = [
+        'english' => 'english',
+        'ielts' => 'english',
+        'pte' => 'english',
+        'toefl' => 'english',
+        'languagecert' => 'english',
+        'german' => 'german',
+        'goethe' => 'german',
+        'testdaf' => 'german',
+        'telc' => 'german',
+        'korean' => 'korean',
+        'topik' => 'korean',
+        'eps-topik' => 'korean',
+    ];
+
+    public const FALLBACK_SLUG = 'english';
+
+    /**
+     * The section slug a legacy code belongs to. Unknown and blank codes fall back
+     * to English rather than silently landing in Korean, which is what the old
+     * frontend `normalizeGroup()` did.
+     */
+    public static function slugFor(?string $code): string
+    {
+        return self::CODE_TO_SLUG[strtolower(trim((string) $code))] ?? self::FALLBACK_SLUG;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function all(): array
+    {
+        return self::CODE_TO_SLUG;
+    }
+}
+```
+
+Create `russellsinternational-api/database/seeders/LanguageProgramSectionBackfillSeeder.php`:
+
+```php
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\LanguageSection;
+use App\Support\LegacyLanguageCodeMap;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+class LanguageProgramSectionBackfillSeeder extends Seeder
+{
+    /**
+     * Points every program at a section. Idempotent: only rows with no section are
+     * touched, so re-running cannot move content the owner has since re-filed.
+     */
+    public function run(): void
+    {
+        (new LanguageSectionSeeder())->run();
+
+        $slugToId = LanguageSection::query()->pluck('id', 'slug');
+        $fallbackId = $slugToId[LegacyLanguageCodeMap::FALLBACK_SLUG]
+            ?? LanguageSection::query()->orderBy('sort_order')->value('id');
+
+        if (! $fallbackId) {
+            return;
+        }
+
+        $hasLegacyColumn = Schema::hasColumn('language_programs', 'language_code');
+        $columns = $hasLegacyColumn ? ['id', 'language_code'] : ['id'];
+
+        foreach (DB::table('language_programs')->whereNull('language_section_id')->get($columns) as $program) {
+            $slug = $hasLegacyColumn
+                ? LegacyLanguageCodeMap::slugFor($program->language_code)
+                : LegacyLanguageCodeMap::FALLBACK_SLUG;
+
+            DB::table('language_programs')
+                ->where('id', $program->id)
+                ->update(['language_section_id' => $slugToId[$slug] ?? $fallbackId]);
+        }
+    }
+}
 ```
 
 - [ ] **Step 4: Update the model**
@@ -720,55 +810,86 @@ and this method after `scopeActive()`:
 Run: `php vendor/bin/phpunit --filter=LanguageSectionBackfillTest`
 Expected: PASS (3 tests).
 
-- [ ] **Step 6: Verify the backfill against a realistic fixture**
+- [ ] **Step 6: Test the legacy mapping and the backfill seeder**
 
-Add this test to the same file:
+Add these tests to the same file. They target the pure map and the callable seeder
+rather than re-running a migration, so they keep passing after Task 5 drops the
+column.
 
 ```php
-    public function test_legacy_codes_backfill_to_the_right_section_with_ielts_folded_into_english(): void
+    public function test_legacy_codes_map_to_the_right_section_with_ielts_folded_into_english(): void
     {
-        // Simulate pre-migration rows, then re-run the backfill the migration performs.
-        foreach ([['english', 'General Spoken English'], ['german', 'German A1'], ['korean', 'TOPIK'], ['ielts', 'Legacy IELTS']] as [$code, $title]) {
-            DB::table('language_programs')->insert([
-                'flag_emoji' => 'XX',
-                'language_code' => $code,
-                'title' => $title,
-                'duration' => '8 Weeks',
-                'badge' => 'B',
-                'description' => 'D',
-                'benefits' => '[]',
-                'color_class' => 'bg-blue-50 text-blue-600',
-                'sort_order' => 0,
-                'is_active' => true,
-                'language_section_id' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
+        $this->assertSame('english', LegacyLanguageCodeMap::slugFor('english'));
+        $this->assertSame('english', LegacyLanguageCodeMap::slugFor('ielts'));
+        $this->assertSame('english', LegacyLanguageCodeMap::slugFor('IELTS'));
+        $this->assertSame('english', LegacyLanguageCodeMap::slugFor(' pte '));
+        $this->assertSame('german', LegacyLanguageCodeMap::slugFor('goethe'));
+        $this->assertSame('korean', LegacyLanguageCodeMap::slugFor('eps-topik'));
+    }
 
-        $this->artisan('migrate', ['--force' => true]);
+    public function test_an_unknown_or_blank_code_falls_back_to_english_not_korean(): void
+    {
+        // The old frontend normalizeGroup() dumped anything unrecognised into
+        // Korean. English is the safe default and matches the fallback section.
+        $this->assertSame('english', LegacyLanguageCodeMap::slugFor('arabic'));
+        $this->assertSame('english', LegacyLanguageCodeMap::slugFor(''));
+        $this->assertSame('english', LegacyLanguageCodeMap::slugFor(null));
+    }
+
+    public function test_the_backfill_seeder_assigns_every_program_a_section(): void
+    {
+        (new LanguageProgramSectionBackfillSeeder())->run();
 
         $english = LanguageSection::where('slug', 'english')->firstOrFail();
 
-        $this->assertSame(
-            $english->id,
-            LanguageProgram::where('title', 'Legacy IELTS')->value('language_section_id'),
-            'ielts programs must land in the English section.'
-        );
-        $this->assertSame(
-            $english->id,
-            LanguageProgram::where('title', 'General Spoken English')->value('language_section_id')
-        );
-        $this->assertSame(
-            LanguageSection::where('slug', 'korean')->value('id'),
-            LanguageProgram::where('title', 'TOPIK')->value('language_section_id')
-        );
+        // Created without a section, so the seeder must file it under the fallback.
+        $orphan = LanguageProgram::create([
+            'flag_emoji' => 'XX',
+            'title' => 'Orphaned Program',
+            'duration' => '8 Weeks',
+            'badge' => 'B',
+            'description' => 'D',
+            'benefits' => [],
+        ]);
+
+        $this->assertNull($orphan->language_section_id);
+
+        (new LanguageProgramSectionBackfillSeeder())->run();
+
+        $this->assertSame($english->id, $orphan->refresh()->language_section_id);
         $this->assertSame(0, LanguageProgram::whereNull('language_section_id')->count());
+    }
+
+    public function test_the_backfill_seeder_never_refiles_a_program_that_already_has_a_section(): void
+    {
+        (new LanguageProgramSectionBackfillSeeder())->run();
+
+        $korean = LanguageSection::where('slug', 'korean')->firstOrFail();
+        $program = LanguageProgram::create([
+            'language_section_id' => $korean->id,
+            'flag_emoji' => 'KR',
+            'title' => 'Deliberately Filed',
+            'duration' => '8 Weeks',
+            'badge' => 'B',
+            'description' => 'D',
+            'benefits' => [],
+        ]);
+
+        (new LanguageProgramSectionBackfillSeeder())->run();
+
+        $this->assertSame($korean->id, $program->refresh()->language_section_id);
     }
 ```
 
+Add these imports to the top of the test file:
+
+```php
+use App\Support\LegacyLanguageCodeMap;
+use Database\Seeders\LanguageProgramSectionBackfillSeeder;
+```
+
 Run: `php vendor/bin/phpunit --filter=LanguageSectionBackfillTest`
-Expected: PASS (4 tests).
+Expected: PASS (7 tests).
 
 - [ ] **Step 7: Verify the whole suite**
 
@@ -790,8 +911,20 @@ The frontend's `DEFAULT_PROGRAMS` array renders 8 cards the owner cannot edit. I
 
 **Files:**
 - Create: `russellsinternational-api/database/seeders/LanguageProgramBackfillSeeder.php`
-- Create: `russellsinternational-api/database/migrations/2026_08_05_000003_import_default_language_programs.php`
 - Create: `russellsinternational-api/tests/Feature/LanguageProgramBackfillTest.php`
+
+**Deliberately NOT a migration.** The original plan ran this import from a migration.
+`RefreshDatabase` runs every migration before every test, so that would import 8
+programs into every test database — and `ContentLifecycleTest:212` asserts
+`data.0.title` on `/api/v1/language-programs` with a fixture at `sort_order = 1`,
+which three imported programs also use. Ordering between equal `sort_order` values is
+undefined, so the assertion would become flaky.
+
+It is also unnecessary: after the lorem record is removed, English, German and Korean
+each still hold one real program, so no tab goes empty and no content is lost when
+`DEFAULT_PROGRAMS` is deleted in Task 9. The import is a convenience that hands the
+owner 8 ready-made programs, so it runs once on production as an explicit step in
+Task 10 rather than automatically everywhere.
 
 **Interfaces:**
 - Consumes: `LanguageSection`, `LanguageSectionSeeder` (Task 2); `language_section_id` and `icon_name` columns (Task 3).
@@ -1051,30 +1184,11 @@ class LanguageProgramBackfillSeeder extends Seeder
 Run: `php vendor/bin/phpunit --filter=LanguageProgramBackfillTest`
 Expected: PASS (4 tests).
 
-- [ ] **Step 5: Run the seeder from a migration so production gets it automatically**
+- [ ] **Step 5: Confirm no migration imports this data**
 
-Create `russellsinternational-api/database/migrations/2026_08_05_000003_import_default_language_programs.php`:
-
-```php
-<?php
-
-use Database\Seeders\LanguageProgramBackfillSeeder;
-use Illuminate\Database\Migrations\Migration;
-
-return new class extends Migration
-{
-    public function up(): void
-    {
-        (new LanguageProgramBackfillSeeder())->run();
-    }
-
-    public function down(): void
-    {
-        // Imported content is indistinguishable from owner-authored content once
-        // live, so deleting it on rollback would risk destroying real edits.
-    }
-};
-```
+Run: `grep -rn "LanguageProgramBackfillSeeder" russellsinternational-api/database/migrations/`
+Expected: no matches. The seeder is invoked only by tests and by the explicit
+production step in Task 10.
 
 - [ ] **Step 6: Verify the whole suite**
 
@@ -1084,8 +1198,8 @@ Expected: all green.
 - [ ] **Step 7: Commit**
 
 ```bash
-git add russellsinternational-api/database/seeders/LanguageProgramBackfillSeeder.php russellsinternational-api/database/migrations/2026_08_05_000003_import_default_language_programs.php russellsinternational-api/tests/Feature/LanguageProgramBackfillTest.php
-git commit -m "Import the hardcoded language programs and drop the lorem record"
+git add russellsinternational-api/database/seeders/LanguageProgramBackfillSeeder.php russellsinternational-api/tests/Feature/LanguageProgramBackfillTest.php
+git commit -m "Add a seeder that imports the hardcoded language programs"
 ```
 
 ---
@@ -1239,9 +1353,24 @@ class LanguageSectionApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // The Task 3 migration seeds the three real sections. They carry no
+        // programs so the endpoint omits them, but clearing them keeps the slug
+        // and count assertions below unambiguous.
+        LanguageSection::query()->delete();
+    }
+
+    /**
+     * The slug is passed explicitly: it is generated from the label otherwise, and
+     * these tests assert on exact slugs.
+     */
     private function section(array $overrides = []): LanguageSection
     {
         return LanguageSection::create($overrides + [
+            'slug' => 'english',
             'label' => 'English Tests',
             'short_label' => 'English',
             'heading' => 'English Test Preparation',
@@ -1289,9 +1418,9 @@ class LanguageSectionApiTest extends TestCase
 
     public function test_sections_are_ordered_and_hidden_sections_are_excluded(): void
     {
-        $third = $this->section(['label' => 'Korean Tests', 'sort_order' => 30]);
-        $hidden = $this->section(['label' => 'Hidden Tests', 'sort_order' => 1, 'is_active' => false]);
-        $first = $this->section(['label' => 'German Tests', 'sort_order' => 10]);
+        $third = $this->section(['slug' => 'korean', 'label' => 'Korean Tests', 'sort_order' => 30]);
+        $hidden = $this->section(['slug' => 'hidden', 'label' => 'Hidden Tests', 'sort_order' => 1, 'is_active' => false]);
+        $first = $this->section(['slug' => 'german', 'label' => 'German Tests', 'sort_order' => 10]);
 
         $this->program($third, ['title' => 'TOPIK']);
         $this->program($hidden, ['title' => 'Hidden Program']);
@@ -1310,10 +1439,10 @@ class LanguageSectionApiTest extends TestCase
         $withProgram = $this->section(['label' => 'English Tests', 'sort_order' => 1]);
         $this->program($withProgram);
 
-        $empty = $this->section(['label' => 'Arabic Tests', 'sort_order' => 2]);
+        $empty = $this->section(['slug' => 'arabic', 'label' => 'Arabic Tests', 'sort_order' => 2]);
         $this->program($empty, ['title' => 'Inactive ALPT', 'is_active' => false]);
 
-        $this->section(['label' => 'French Tests', 'sort_order' => 3]); // no programs at all
+        $this->section(['slug' => 'french', 'label' => 'French Tests', 'sort_order' => 3]); // no programs at all
 
         $this->getJson('/api/v1/language-sections')
             ->assertOk()
@@ -2555,7 +2684,42 @@ cd d:/russelinternational/russellsinternational-api && php vendor/bin/phpunit
 ```
 Expected: PASS. Fixtures there that set `language_code` need updating to `language_section_id`.
 
-- [ ] **Step 3: Back up production before deploying**
+- [ ] **Step 3: Make migrations run on deploy — verify before trusting it**
+
+This is the highest-risk step in the plan. The Railway service has **no start
+command set**, and the repo's `nixpacks.toml` is dead config (Railway uses Railpack
+here — `RAILPACK_PHP_*` variables are what take effect). Production has 23 of 23
+migrations applied, but the newest dates from May and the media fix added none, so
+nothing has actually exercised auto-migration on deploy.
+
+If migrations do not run automatically, pushing this work ships code that queries
+`language_sections` against a database without that table. Vercel and Railway both
+deploy from the same `production` push, so the live Languages page would break.
+
+Do not guess. Set an explicit start command so the ordering is guaranteed:
+
+```bash
+railway variables --set 'RAILPACK_PHP_ROOT_DIR=/app/public'
+```
+
+then in the Railway dashboard (Service → Settings → Deploy → Custom Start Command),
+or via the API, set:
+
+```
+php artisan migrate --force && php artisan config:clear && <the Railpack default serve command>
+```
+
+Read the current default from the latest deploy log first — overwriting it with a
+guessed serve command would take the site down. If the default cannot be determined,
+use the safer alternative instead: leave the start command empty and run migrations
+explicitly straight after the deploy in Step 4, checking the schema before declaring
+success.
+
+The frontend already degrades safely here: `useLanguageSections` returning nothing
+makes `LanguagesSection` render `null`, so a missing table hides that one section
+rather than erroring the page. That is a safety net, not a substitute for ordering.
+
+- [ ] **Step 4: Back up production before deploying**
 
 ```bash
 cd "C:/Users/HP/AppData/Local/Temp/claude/d--russelinternational/8e118020-fca7-4df7-baa5-3267ac4eeea7/scratchpad"
@@ -2563,7 +2727,7 @@ php pdo_dump.php sakura.proxy.rlwy.net 37288 railway root 'TFDainXJkYBOFGwEbBdSE
 ```
 Expected: a non-empty `.sql` file, with `language_programs` and `language_sections` row counts printed.
 
-- [ ] **Step 4: Deploy**
+- [ ] **Step 5: Deploy**
 
 ```bash
 cd d:/russelinternational/russellsinternational && git push production main
@@ -2575,7 +2739,7 @@ Wait for Railway to report SUCCESS, then confirm the deployed commit:
 railway status
 ```
 
-- [ ] **Step 5: Verify the API on production**
+- [ ] **Step 6: Verify the API on production**
 
 ```bash
 B=https://russellsinternational-production-production-c607.up.railway.app
@@ -2583,7 +2747,7 @@ curl -s --max-time 30 "$B/api/v1/language-sections" | head -c 1200
 ```
 Expected: three sections (english, german, korean), each with programs, `tab_label` present, no `language_code` anywhere, and no program titled "Acton Kim".
 
-- [ ] **Step 6: Verify the admin round trip on production**
+- [ ] **Step 7: Verify the admin round trip on production**
 
 In the browser at `$B/admin/website/language-page`:
 
@@ -2594,19 +2758,19 @@ In the browser at `$B/admin/website/language-page`:
 5. Try to delete Arabic Tests while it has a program → expect the blocking notification and the section still present.
 6. Delete the program, then delete the section → both gone.
 
-- [ ] **Step 7: Verify mobile behaviour**
+- [ ] **Step 8: Verify mobile behaviour**
 
 At 390px width on `/languages`: the tab strip is one row and swipes horizontally, the active tab scrolls into view, `document.documentElement.scrollWidth === clientWidth` (no horizontal overflow), and page height is no greater than the 2821px measured before this change.
 
-- [ ] **Step 8: Re-run the admin regression crawl**
+- [ ] **Step 9: Re-run the admin regression crawl**
 
 Re-run the 174-page admin sweep used during the earlier QA pass and confirm every page is HTTP 200 with no console errors and no broken thumbnails.
 
-- [ ] **Step 9: Update the spec with the planning refinement**
+- [ ] **Step 10: Update the spec with the planning refinement**
 
 The spec did not mention adding `icon_name` to `language_programs`. Add one line under **Data model** recording that programs carry an optional `icon_name` that falls back to the section's icon, so the imported demo programs keep their original per-card icons.
 
-- [ ] **Step 10: Commit**
+- [ ] **Step 11: Commit**
 
 ```bash
 git add -A

@@ -106,15 +106,29 @@ export interface StudyDestination {
 
 export interface LanguageProgram {
   id: number;
-  flag_emoji: string;
-  language_code: string;
   title: string;
   duration: string;
   badge: string;
   description: string;
   benefits: string[];
   color_class: string;
+  icon_name: string | null;
   image_url: string | null;
+}
+
+/** A tab on the Languages page, with the programs filed under it. */
+export interface LanguageSection {
+  id: number;
+  slug: string;
+  label: string;
+  short_label: string | null;
+  tab_label: string;
+  heading: string;
+  subtitle: string | null;
+  icon_name: string;
+  color_class: string;
+  sort_order: number;
+  programs: LanguageProgram[];
 }
 
 // ─── Careers ───────────────────────────────────────────────────────────────────
