@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Resources\LanguageProgramResource;
+use App\Filament\Resources\LanguageSectionResource;
 
 class LanguagePageContent extends WebsiteContentPage
 {
@@ -25,6 +26,7 @@ class LanguagePageContent extends WebsiteContentPage
                 'sections' => [
                     $this->pageRecord('Page SEO and status', 'Page registry, active status and SEO metadata for Languages.', 'languages'),
                     $this->pageSection('Page hero', 'Top hero image, title, subtitle and eyebrow for Languages.', 'languages', 'hero'),
+                    $this->resourceList('Language sections (tabs)', 'The tabs on the Languages page. Add a section here to offer a new language.', LanguageSectionResource::class, 'Manage Sections'),
                     $this->resourceList('Language programs', 'Language course cards shown on the Languages page.', LanguageProgramResource::class, 'Manage Programs'),
                     $this->pageSection('Global CTA banner', 'Shared call-to-action banner shown near the bottom.', 'global', 'cta'),
                 ],
