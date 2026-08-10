@@ -21,6 +21,9 @@ class LanguageSection extends Model
 
     protected $appends = ['tab_label'];
 
+    /**
+     * @return HasMany<LanguageProgram, $this>
+     */
     public function programs(): HasMany
     {
         return $this->hasMany(LanguageProgram::class);

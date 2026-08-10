@@ -30,6 +30,9 @@ class LanguageProgram extends Model
         return $query->where('is_active', true)->orderBy('sort_order');
     }
 
+    /**
+     * @return BelongsTo<LanguageSection, $this>
+     */
     public function section(): BelongsTo
     {
         return $this->belongsTo(LanguageSection::class, 'language_section_id');
