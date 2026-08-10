@@ -4,17 +4,17 @@ namespace Tests\Feature;
 
 use App\Models\LanguageProgram;
 use App\Models\LanguageSection;
-use Database\Seeders\LanguageProgramBackfillSeeder;
+use Database\Seeders\LanguageProgramSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class LanguageProgramBackfillTest extends TestCase
+class LanguageProgramSeederTest extends TestCase
 {
     use RefreshDatabase;
 
     public function test_it_imports_the_eight_former_hardcoded_programs(): void
     {
-        (new LanguageProgramBackfillSeeder)->run();
+        (new LanguageProgramSeeder)->run();
 
         $this->assertSame(8, LanguageProgram::count());
 
@@ -37,8 +37,8 @@ class LanguageProgramBackfillTest extends TestCase
 
     public function test_running_it_twice_creates_no_duplicates(): void
     {
-        (new LanguageProgramBackfillSeeder)->run();
-        (new LanguageProgramBackfillSeeder)->run();
+        (new LanguageProgramSeeder)->run();
+        (new LanguageProgramSeeder)->run();
 
         $this->assertSame(8, LanguageProgram::count());
         $this->assertSame(1, LanguageProgram::where('title', 'IELTS Preparation')->count());
@@ -59,7 +59,7 @@ class LanguageProgramBackfillTest extends TestCase
             'benefits' => ['Owner benefit'],
         ]);
 
-        (new LanguageProgramBackfillSeeder)->run();
+        (new LanguageProgramSeeder)->run();
 
         $this->assertSame(1, LanguageProgram::where('title', 'IELTS Preparation')->count());
         $this->assertSame('OWNER EDITED', LanguageProgram::where('title', 'IELTS Preparation')->value('duration'));
@@ -80,7 +80,7 @@ class LanguageProgramBackfillTest extends TestCase
             'benefits' => [],
         ]);
 
-        (new LanguageProgramBackfillSeeder)->run();
+        (new LanguageProgramSeeder)->run();
 
         $this->assertSame(0, LanguageProgram::where('title', 'Acton Kim')->count());
     }

@@ -6,6 +6,7 @@ use App\Models\LanguageProgram;
 use App\Models\LanguageSection;
 use App\Support\LegacyLanguageCodeMap;
 use Database\Seeders\LanguageProgramSectionBackfillSeeder;
+use Database\Seeders\LanguageProgramSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -110,6 +111,34 @@ class LanguageSectionBackfillTest extends TestCase
 
         $this->assertSame($english->id, $orphan->refresh()->language_section_id);
         $this->assertSame(0, LanguageProgram::whereNull('language_section_id')->count());
+    }
+
+    public function test_language_code_column_is_gone_so_the_section_relation_is_the_only_source_of_truth(): void
+    {
+        $this->assertFalse(
+            DB::getSchemaBuilder()->hasColumn('language_programs', 'language_code'),
+            'language_code must be dropped; two sources of truth for the same fact caused the original grouping bug.'
+        );
+    }
+
+    public function test_programs_can_be_filtered_by_section_slug(): void
+    {
+        (new LanguageProgramSeeder)->run();
+
+        $this->getJson('/api/v1/language-programs?section=german')
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonCount(3, 'data')
+            ->assertJsonMissing(['title' => 'IELTS Preparation']);
+    }
+
+    public function test_filtering_by_an_unknown_section_returns_nothing_rather_than_everything(): void
+    {
+        (new LanguageProgramSeeder)->run();
+
+        $this->getJson('/api/v1/language-programs?section=klingon')
+            ->assertOk()
+            ->assertJsonCount(0, 'data');
     }
 
     public function test_the_backfill_seeder_never_refiles_a_program_that_already_has_a_section(): void

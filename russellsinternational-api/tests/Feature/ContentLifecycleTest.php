@@ -216,7 +216,6 @@ class ContentLifecycleTest extends TestCase
                 'updated' => 'QA_TEST_LANGUAGE_UPDATED',
                 'attributes' => [
                     'flag_emoji' => 'QA',
-                    'language_code' => 'en',
                     'title' => 'QA_TEST_LANGUAGE',
                     'duration' => '1 Week',
                     'badge' => 'QA',

@@ -12,7 +12,7 @@ class LanguageProgram extends Model
     use NormalizesJsonLists;
 
     protected $fillable = [
-        'language_section_id', 'flag_emoji', 'language_code', 'title', 'duration',
+        'language_section_id', 'flag_emoji', 'title', 'duration',
         'badge', 'description', 'benefits', 'color_class',
         'icon_name', 'image', 'sort_order', 'is_active',
     ];

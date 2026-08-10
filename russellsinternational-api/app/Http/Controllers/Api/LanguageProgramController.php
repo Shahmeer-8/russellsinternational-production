@@ -10,17 +10,12 @@ class LanguageProgramController extends Controller
 {
     public function index(Request $request)
     {
-        $query = LanguageProgram::active();
+        $query = LanguageProgram::active()->with('section');
 
-        if ($request->filled('code')) {
-            $codes = match ($request->code) {
-                'english' => ['english', 'ielts', 'pte', 'toefl', 'languagecert'],
-                'german' => ['german', 'goethe', 'testdaf', 'telc'],
-                'korean' => ['korean', 'topik', 'eps-topik'],
-                default => [$request->code],
-            };
+        if ($request->filled('section')) {
+            $slug = $request->string('section')->toString();
 
-            $query->whereIn('language_code', $codes);
+            $query->whereHas('section', fn ($section) => $section->where('slug', $slug));
         }
 
         return response()->json(['success' => true, 'data' => $query->get()]);
