@@ -58,8 +58,13 @@ class LanguageProgramResource extends Resource
             Forms\Components\Textarea::make('description')->required()->rows(3)->columnSpanFull(),
             Forms\Components\Repeater::make('benefits')
                 ->label('What is included')
+                ->helperText('Bullet points shown when a visitor opens this program. Add as many as you need.')
                 ->schema([Forms\Components\TextInput::make('item')->required()])
-                ->defaultItems(4)
+                // One row, not four. Every row's text is required, so shipping four
+                // meant the owner could not save until all four were filled in or
+                // three were deleted by hand.
+                ->defaultItems(1)
+                ->addActionLabel('Add another point')
                 ->collapsible()
                 ->columnSpanFull(),
             Forms\Components\FileUpload::make('image')
