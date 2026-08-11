@@ -3,6 +3,7 @@ import { ArrowRight, MapPin } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import DetailDrawer from "@/components/DetailDrawer";
 import { useStudyDestinations } from "@/hooks/api";
+import ResponsiveCardRow from "@/components/ResponsiveCardRow";
 import { useSectionCopy } from "@/hooks/useSectionCopy";
 
 type DestinationCard = {
@@ -53,12 +54,14 @@ const StudyDestinations = () => {
               {[...Array(4)].map((_, i) => <div key={i} className="h-72 rounded-2xl bg-primary-foreground/5 animate-pulse" />)}
             </div>
           ) : displayDestinations.length === 0 ? null : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {displayDestinations.map((d) => (
+            <ResponsiveCardRow
+              gridClassName="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
+              items={displayDestinations.map((d) => ({
+                key: d.country,
+                node: (
                 <div
-                  key={d.country}
                   onClick={() => openDrawer(d)}
-                  className="bg-primary-foreground/5 border border-primary-foreground/10 rounded-2xl p-7 text-center group cursor-pointer hover:bg-primary-foreground/10 transition-all duration-300 hover:-translate-y-1"
+                  className="bg-primary-foreground/5 border border-primary-foreground/10 rounded-2xl p-7 text-center group cursor-pointer hover:bg-primary-foreground/10 transition-all duration-300 hover:-translate-y-1 h-full"
                 >
                   <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">{d.flag}</div>
                   <h3 className="font-bold font-heading text-lg mb-1">{d.country}</h3>
@@ -70,8 +73,9 @@ const StudyDestinations = () => {
                     Explore <ArrowRight className="w-3.5 h-3.5" />
                   </span>
                 </div>
-              ))}
-            </div>
+                ),
+              }))}
+            />
           )}
         </div>
       </section>

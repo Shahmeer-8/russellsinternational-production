@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import DetailDrawer from "@/components/DetailDrawer";
 import { useCourses } from "@/hooks/api";
+import ResponsiveCardRow from "@/components/ResponsiveCardRow";
 import { resolveIcon } from "@/lib/icons";
 import { useSectionCopy } from "@/hooks/useSectionCopy";
 
@@ -103,11 +104,12 @@ const FeaturedCourses = () => {
               ))}
             </div>
           ) : courses.length === 0 ? null : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {courses.map((c) => (
+            <ResponsiveCardRow
+              items={courses.map((c) => ({
+                key: c.title,
+                node: (
               <div
-                key={c.title}
-                className="premium-card p-6 group cursor-pointer"
+                className="premium-card p-6 group cursor-pointer h-full"
                 onClick={() => openDrawer(c)}
               >
                 <div className="flex items-start justify-between mb-5">
@@ -134,8 +136,9 @@ const FeaturedCourses = () => {
                   {tab === "navttc" ? "Apply Now" : "Learn More"} <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </div>
-              ))}
-            </div>
+                ),
+              }))}
+            />
           )}
         </div>
       </section>

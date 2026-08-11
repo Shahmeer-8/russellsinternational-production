@@ -1,6 +1,7 @@
 import { Star, Quote, PlayCircle } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useTestimonials } from "@/hooks/api";
+import ResponsiveCardRow from "@/components/ResponsiveCardRow";
 import { useSectionCopy } from "@/hooks/useSectionCopy";
 import {
   Carousel,
@@ -136,9 +137,10 @@ const Testimonials = () => {
         )}
 
         {!isLoading && writtenList.length > 0 && writtenList.length <= 3 && (
-          <div className="grid md:grid-cols-3 gap-6">
-            {writtenList.map(renderWrittenCard)}
-          </div>
+          <ResponsiveCardRow
+            gridClassName="grid md:grid-cols-3 gap-6"
+            items={writtenList.map((r) => ({ key: r.name, node: renderWrittenCard(r) }))}
+          />
         )}
       </div>
     </section>

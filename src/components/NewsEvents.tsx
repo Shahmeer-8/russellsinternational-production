@@ -3,6 +3,7 @@ import { Calendar, ArrowRight } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import DetailDrawer from "@/components/DetailDrawer";
 import { useEvents } from "@/hooks/api";
+import ResponsiveCardRow from "@/components/ResponsiveCardRow";
 import { useSectionCopy } from "@/hooks/useSectionCopy";
 
 type EventCard = {
@@ -60,9 +61,12 @@ const NewsEvents = () => {
               {[...Array(3)].map((_, i) => <div key={i} className="premium-card h-80 animate-pulse" />)}
             </div>
           ) : eventsList.length === 0 ? null : (
-            <div className="grid md:grid-cols-3 gap-6">
-              {eventsList.map((e) => (
-                <div key={e.title} className="premium-card overflow-hidden group cursor-pointer" onClick={() => openDrawer(e)}>
+            <ResponsiveCardRow
+              gridClassName="grid md:grid-cols-3 gap-6"
+              items={eventsList.map((e) => ({
+                key: e.title,
+                node: (
+                <div className="premium-card overflow-hidden group cursor-pointer h-full" onClick={() => openDrawer(e)}>
                   <div className="h-48 overflow-hidden bg-muted">
                     {e.image && (
                       <img src={e.image} alt={e.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" decoding="async" width={800} height={512} />
@@ -77,8 +81,9 @@ const NewsEvents = () => {
                     <p className="text-sm text-muted-foreground leading-relaxed">{e.desc}</p>
                   </div>
                 </div>
-              ))}
-            </div>
+                ),
+              }))}
+            />
           )}
         </div>
       </section>
