@@ -24,7 +24,12 @@ const ServicesSection = () => {
 
   const services = data?.data ?? [];
 
-  if (isLoading || services.length === 0) {
+  // Bail out only once we know for certain there is nothing to show. Returning
+  // null while still loading would skip mounting the ref below on the first
+  // render; useScrollReveal's observer effect only runs once, so with nothing to
+  // observe that first time the section would stay invisible forever once the
+  // data arrived and it finally rendered.
+  if (!isLoading && services.length === 0) {
     return null;
   }
 
@@ -72,7 +77,15 @@ const ServicesSection = () => {
             </p>
           </div>
 
-          <ResponsiveCardRow items={cards} />
+          {isLoading ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="premium-card p-6 h-48 animate-pulse" />
+              ))}
+            </div>
+          ) : (
+            <ResponsiveCardRow items={cards} />
+          )}
         </div>
       </section>
 
